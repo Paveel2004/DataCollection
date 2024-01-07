@@ -10,6 +10,12 @@ namespace Data_collection
             Console.WriteLine("\n"+text);
             Console.ForegroundColor = ConsoleColor.Green;
         }
+        static void ExeCopyng(string destinationDirectory)
+        {
+            string currentDirrectory = AppDomain.CurrentDomain.BaseDirectory,
+                executablePath = Path.Combine(currentDirrectory, "Data collection.exe");
+
+        }
         static void Main(string[] args)
         {
 
@@ -49,6 +55,7 @@ namespace Data_collection
 
             // Пути к системным каталогам
             WriteLineRed("Системные каталоги:");
+            Console.WriteLine($"Автозапуск: {DataOS.GetStartupFolderPath()}");
             Console.WriteLine($"Каталог системы: {Environment.SystemDirectory}");
             Console.WriteLine($"Каталог временных файлов: {Environment.GetEnvironmentVariable("TEMP")}");// Информация об операционной системе
 
@@ -64,7 +71,7 @@ namespace Data_collection
             {
                 Console.WriteLine($"Имя пользователя: {user["Name"]}");
                 Console.WriteLine($"Полное имя пользователя: {user["FullName"]}");
-                Console.WriteLine($"SID: {user["SID"]}");
+                Console.WriteLine($"SID: {user["SID"]}" +" | "+ user["SID"].ToString().Length) ;
                 Console.WriteLine($"Статус: {user["Status"]}");
                 Console.WriteLine();
             }
@@ -80,6 +87,8 @@ namespace Data_collection
                 Console.WriteLine($"BIOS Version: {bios["Version"]}");
                 Console.WriteLine($"Manufacturer: {bios["Manufacturer"]}");
                 Console.WriteLine($"Description: {bios["Description"]}");
+                Console.WriteLine($"Серийный номер: {bios["SerialNumber"].ToString()}");
+                
             }
 
 
@@ -94,7 +103,12 @@ namespace Data_collection
                 ulong totalPhysicalMemory = Convert.ToUInt64(memory["TotalPhysicalMemory"]);
                 Console.WriteLine($"Объем оперативной памяти: {totalPhysicalMemory / (1024 * 1024)} MB");
             }
-  
+            ///////////
+            Console.ReadLine();
+
+
+
+
 
         }
     }

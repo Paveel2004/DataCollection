@@ -6,6 +6,7 @@
     <RootNamespace>Data_collection</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationManifest>bin\Debug\net6.0\Data collection.exe.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
