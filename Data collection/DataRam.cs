@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace Data_collection
 {
-    public class RamInfo
+    public class DataRam
     {
         public static string RamType
         {
@@ -69,6 +69,27 @@ namespace Data_collection
             }
 
             return outValue;
+        }
+
+        public static ulong GetTotalPhysicalMemory()
+        {
+            try
+            {
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT TotalPhysicalMemory FROM Win32_ComputerSystem");
+                ManagementObjectCollection collection = searcher.Get();
+
+                foreach (ManagementObject obj in collection)
+                {
+                    ulong totalMemoryBytes = Convert.ToUInt64(obj["TotalPhysicalMemory"]);
+                    return totalMemoryBytes;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при получении объема оперативной памяти: {ex.Message}");
+            }
+
+            return 0;
         }
         public static float GetMemoryUsage()
         {

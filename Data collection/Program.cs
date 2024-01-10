@@ -53,114 +53,96 @@ namespace Data_collection
 
             return diskInfo;
         }
-        public static double EthernetSpeed()
-        {
-            var nics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
-            // Select desired NIC
-            var nic = nics.SingleOrDefault(n => n.Name == "Ethernet");
-
-            
-                var reads = Enumerable.Empty<double>();
-                var sw = new Stopwatch();
-                var lastBr = nic.GetIPv4Statistics().BytesReceived;
-            
-                    sw.Restart();
-                    Thread.Sleep(100);
-                    var elapsed = sw.Elapsed.TotalSeconds;
-                    var br = nic.GetIPv4Statistics().BytesReceived;
-
-                    var local = (br - lastBr) / elapsed;
-                    lastBr = br;
-
-                    // Keep last 20, ~2 seconds
-                    reads = new[] { local }.Concat(reads).Take(20);
-
-                   
-                    var bSec = reads.Sum() / reads.Count();
-                    var kbs = (bSec * 8) / 1024;
-
-                return kbs;
-                
-
-        }
+       
         static void Main(string[] args)
         {
-            while (true) 
-            Console.WriteLine("Kb/s ~ " + EthernetSpeed()); 
-            var message = new
+
+            Console.WriteLine(DataNetwork.EthernetSpeed());
+            while (true)
             {
-                CPU = new
+                var message = new
                 {
-                    Architecture = DataCPU.GetProcessorArchitecture(),
-                    Name = DataCPU.GetProcessorName(),
-                    CoreCount = DataCPU.GetProcessorCoreCount(),
-                    Temperature = DataCPU.GetProcessorTemperature(),
-                    SerialNumber = DataCPU.GetProcessorNum(),
-                    CpuUsage = DataCPU.GetCpuUsage()
-                },
-                OS = new
+                    CPU = new
+                    {
+                        Architecture = DataCPU.GetProcessorArchitecture(),
+                        Name = DataCPU.GetProcessorName(),
+                        CoreCount = DataCPU.GetProcessorCoreCount(),
+                        Temperature = DataCPU.GetProcessorTemperature(),
+                        SerialNumber = DataCPU.GetProcessorNum(),
+                        CpuUsage = DataCPU.GetCpuUsage()
+                    },
+                    OS = new
+                    {
+                        OS = DataOS.GetOperatingSystem(),
+                        Architecture = DataOS.GetSystemBitArchitecture(),
+                        SerialNumber = DataOS.GetOperatingSystemSerialNumber(),
+                        NumberOfUsers = DataOS.GetNumberOfUsers(),
+                        SystemState = DataOS.GetSystemState(),
+                        VersionOS = DataOS.GetOperatingSystemVersion(),
+
+                    },
+                    BIOS = new
+                    {
+                        SerialNumber = DataBIOS.GetBiosSerialNumber(),
+                        BiosVeesion = DataBIOS.GetBiosVersion()
+                    },
+                    USER = new
+                    {
+                        UserName = DataUser.GetUserName(),
+                        UserSID = DataUser.GetUserSID(),
+                        UserState = DataUser.GetUserStatus()
+                    },
+                    NETWORK = new
+                    {
+                        IP = DataNetwork.GetIPAddress(),
+                        MAC = DataNetwork.GetPhysicalMacAddress(),
+                        EthernetSpeed = DataNetwork.EthernetSpeed(),
+                    },
+                    RAM = new
+                    {
+                        RamType = DataRam.RamType,
+                        RamUsage = DataRam.GetMemoryUsage(),
+                        TotalPhisicalMemory = DataRam.GetTotalPhysicalMemory(),
+                    }
+
+                };
+                string messageData = JsonConvert.SerializeObject(message, Formatting.Indented);
+
+                Console.WriteLine(messageData);
+
+
+                try
                 {
-                    OS = DataOS.GetOperatingSystem(),
-                    Architecture = DataOS.GetSystemBitArchitecture(),
-                    SerialNumber = DataOS.GetOperatingSystemSerialNumber(),//Исправить
-                    NumberOfUsers = DataOS.GetNumberOfUsers(),
-                    SystemState = DataOS.GetSystemState(),
-                    VersionOS = DataOS.GetOperatingSystemVersion(),               
-                    
-                },
-                BIOS = new
-                {
-                    SerialNumber = DataBIOS.GetBiosSerialNumber(),
-                    BiosVeesion = DataBIOS.GetBiosVersion()
-                },
-                USER = new
-                {
-                    UserName = DataUser.GetUserName(),
-                    UserSID = DataUser.GetUserSID(),
-                    UserState = DataUser.GetUserStatus()
-                },
-                NETWORK = new
-                {
-                    IP = DataNetwork.GetIPAddress(),
-                    MAC = DataNetwork.GetMacAddress(),
+
+                    string serverAddress = "127.0.0.1";
+                    int port = 1111;
+
+                    // Создаем TcpClient и подключаемся к серверу
+                    using TcpClient client = new TcpClient(serverAddress, port);
+                    Console.WriteLine("Подключено к серверу...");
+
+                    // Получаем поток для обмена данными с сервером
+                    using NetworkStream stream = client.GetStream();
+
+                    // Отправляем сообщение серверу
+
+                    byte[] data = Encoding.UTF8.GetBytes(messageData);
+                    stream.Write(data, 0, data.Length);
+                    Console.WriteLine($"Отправлено сообщение: {messageData}");
+                    Thread.Sleep(5000);
+
+                    // Читаем ответ от сервера
+                    data = new byte[5000];
+                    int bytesRead = stream.Read(data, 0, data.Length);
+                    string response = Encoding.UTF8.GetString(data, 0, bytesRead);
+                    Console.WriteLine($"Ответ от сервера: {response}");
                 }
-            };
-            string messageData = JsonConvert.SerializeObject(message, Formatting.Indented);
-
-/*            Console.WriteLine(messageData);
-
-
-            try {
-
-            string serverAddress = "127.0.0.1";
-            int port = 1111;
-
-            // Создаем TcpClient и подключаемся к серверу
-            using TcpClient client = new TcpClient(serverAddress, port);
-            Console.WriteLine("Подключено к серверу...");
-
-            // Получаем поток для обмена данными с сервером
-            using NetworkStream stream = client.GetStream();
-
-            // Отправляем сообщение серверу
-           
-            byte[] data = Encoding.UTF8.GetBytes(messageData);
-            stream.Write(data, 0, data.Length);
-            Console.WriteLine($"Отправлено сообщение: {messageData}");
-                Thread.Sleep(5000);
-
-                // Читаем ответ от сервера
-                data = new byte[5000];
-            int bytesRead = stream.Read(data, 0, data.Length);
-            string response = Encoding.UTF8.GetString(data, 0, bytesRead);
-            Console.WriteLine($"Ответ от сервера: {response}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-*/
-
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                Console.ReadLine();
+            }
 
 
 
