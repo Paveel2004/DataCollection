@@ -68,6 +68,7 @@ namespace Data_collection
             }
             return 0;
         }
+
         public static double GetCpuUsage()
         {
             try

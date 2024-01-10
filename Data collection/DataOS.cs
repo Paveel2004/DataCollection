@@ -63,18 +63,27 @@ namespace Data_collection
 
             return 0; // В случае ошибки возвращаем 0
         }
-        public static string GetSystemSerialNumber()
+        public static string GetOperatingSystemSerialNumber()
         {
-            string query = "SELECT SerialNumber FROM Win32_BIOS";
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
-            ManagementObjectCollection queryCollection = searcher.Get();
-
-            foreach (ManagementObject m in queryCollection)
+            try
             {
-                return m["SerialNumber"]?.ToString() ?? "Unknown";
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_OperatingSystem");
+                ManagementObjectCollection collection = searcher.Get();
+
+                foreach (ManagementObject obj in collection)
+                {
+                    if (obj["SerialNumber"] != null)
+                    {
+                        return obj["SerialNumber"].ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при получении серийного номера операционной системы: {ex.Message}");
             }
 
-            return "Unknown";
+            return "N/A";
         }
         public static int GetNumberOfUsers()
         {

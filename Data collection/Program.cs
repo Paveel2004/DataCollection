@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
@@ -52,8 +53,40 @@ namespace Data_collection
 
             return diskInfo;
         }
+        public static double EthernetSpeed()
+        {
+            var nics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+            // Select desired NIC
+            var nic = nics.SingleOrDefault(n => n.Name == "Ethernet");
+
+            
+                var reads = Enumerable.Empty<double>();
+                var sw = new Stopwatch();
+                var lastBr = nic.GetIPv4Statistics().BytesReceived;
+            
+                    sw.Restart();
+                    Thread.Sleep(100);
+                    var elapsed = sw.Elapsed.TotalSeconds;
+                    var br = nic.GetIPv4Statistics().BytesReceived;
+
+                    var local = (br - lastBr) / elapsed;
+                    lastBr = br;
+
+                    // Keep last 20, ~2 seconds
+                    reads = new[] { local }.Concat(reads).Take(20);
+
+                   
+                    var bSec = reads.Sum() / reads.Count();
+                    var kbs = (bSec * 8) / 1024;
+
+                return kbs;
+                
+
+        }
         static void Main(string[] args)
         {
+            while (true) 
+            Console.WriteLine("Kb/s ~ " + EthernetSpeed()); 
             var message = new
             {
                 CPU = new
@@ -69,7 +102,7 @@ namespace Data_collection
                 {
                     OS = DataOS.GetOperatingSystem(),
                     Architecture = DataOS.GetSystemBitArchitecture(),
-                    SerialNumber = DataOS.GetSystemSerialNumber(),//Исправить
+                    SerialNumber = DataOS.GetOperatingSystemSerialNumber(),//Исправить
                     NumberOfUsers = DataOS.GetNumberOfUsers(),
                     SystemState = DataOS.GetSystemState(),
                     VersionOS = DataOS.GetOperatingSystemVersion(),               
@@ -84,6 +117,7 @@ namespace Data_collection
                 {
                     UserName = DataUser.GetUserName(),
                     UserSID = DataUser.GetUserSID(),
+                    UserState = DataUser.GetUserStatus()
                 },
                 NETWORK = new
                 {
@@ -93,7 +127,7 @@ namespace Data_collection
             };
             string messageData = JsonConvert.SerializeObject(message, Formatting.Indented);
 
-            Console.WriteLine(messageData);
+/*            Console.WriteLine(messageData);
 
 
             try {
@@ -125,9 +159,7 @@ namespace Data_collection
         {
             Console.WriteLine(ex.Message);
         }
-
-
-
+*/
 
 
 
@@ -253,41 +285,6 @@ namespace Data_collection
 
 
 
-        public static void EthernetSpeed()
-        {
-            var nics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
-            // Select desired NIC
-            var nic = nics.SingleOrDefault(n => n.Name == "Ethernet");
-
-            if (nic != null)
-            {
-                var reads = Enumerable.Empty<double>();
-                var sw = new Stopwatch();
-                var lastBr = nic.GetIPv4Statistics().BytesReceived;
-                for (var i = 0; i < 1000; i++)
-                {
-                    sw.Restart();
-                    Thread.Sleep(100);
-                    var elapsed = sw.Elapsed.TotalSeconds;
-                    var br = nic.GetIPv4Statistics().BytesReceived;
-
-                    var local = (br - lastBr) / elapsed;
-                    lastBr = br;
-
-                    // Keep last 20, ~2 seconds
-                    reads = new[] { local }.Concat(reads).Take(20);
-
-                    if (i % 10 == 0)
-                    { // ~1 second
-                        var bSec = reads.Sum() / reads.Count();
-                        var kbs = (bSec * 8) / 1024;
-                        Console.WriteLine("Kb/s ~ " + kbs);
-                    }
-                    //}
-                }
-
-            }
-            
-        }
+       
     }
 }

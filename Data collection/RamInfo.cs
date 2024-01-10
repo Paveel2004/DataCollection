@@ -4,6 +4,8 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace Data_collection
 {
@@ -68,5 +70,25 @@ namespace Data_collection
 
             return outValue;
         }
+        public static float GetMemoryUsage()
+        {
+            try
+            {
+                string categoryName = "Memory";
+                string counterName = "% Committed Bytes In Use";
+                using (PerformanceCounter counter = new PerformanceCounter(categoryName, counterName))
+                {
+                    return counter.NextValue();
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+
+        }
+
     }
+
 }
