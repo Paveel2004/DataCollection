@@ -6,29 +6,62 @@ using System.Management;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Win32;
+using System.IO;
+
 
 namespace Data_collection
 {
-    class DiskInfo
-    {
-        public string DeviceID { get; set; }
-        public ulong Size { get; set; }
-        public ulong FreeSpace { get; set; }
-        public string VolumeName { get; set; }
-    }
+
     internal class Program
     {
-        static void WriteLineRed(string text)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("\n" + text);
-            Console.ForegroundColor = ConsoleColor.Green;
-        }
-        static void ExeCopyng(string destinationDirectory)
-        {
-            string currentDirrectory = AppDomain.CurrentDomain.BaseDirectory,
-                executablePath = Path.Combine(currentDirrectory, "Data collection.exe");
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool FreeConsole();
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+        
+        static void HideConsoleWindow()
+        {
+            IntPtr handle = GetConsoleWindow();
+            ShowWindow(handle, SW_HIDE);  
+        }
+
+
+        public static void CreateBatStartup()
+        {
+            try
+            {
+          
+                string startupFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+
+                using (StreamWriter sw = File.CreateText(Path.Combine(startupFolderPath, "MyStartup.bat")))
+                {
+                    sw.WriteLine("@echo off");
+                    sw.WriteLine($"start \"\" \"{System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName}\"");
+                }
+
+                Console.WriteLine("Файл .bat успешно создан в папке автозапуска.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка: {ex.Message}");
+            }
+        }
+        class DiskInfo
+        {
+            public string DeviceID { get; set; }
+            public ulong Size { get; set; }
+            public ulong FreeSpace { get; set; }
+            public string VolumeName { get; set; }
         }
         static DiskInfo[] GetDiskInformation()
         {
@@ -53,11 +86,30 @@ namespace Data_collection
 
             return diskInfo;
         }
-       
         static void Main(string[] args)
         {
+   /*         try
+            {
+                Console.WriteLine("Информация о дисках:");
+                var diskInfo = GetDiskInformation();
+                foreach (var disk in diskInfo)
+                {
+                    Console.WriteLine($"Диск {disk.DeviceID}:");
+                    Console.WriteLine($"   Объем диска: {disk.Size} байт");
+                    Console.WriteLine($"   Свободное пространство: {disk.FreeSpace} байт");
+                    Console.WriteLine($"   Метка тома: {disk.VolumeName}");
+                    Console.WriteLine();
+                }
+            }
+            catch (ManagementException e)
+            {
+                Console.WriteLine("Ошибка WMI: " + e.Message);
+            }*/
+      
 
-            Console.WriteLine(DataNetwork.EthernetSpeed());
+
+            CreateBatStartup();
+            //Console.WriteLine(DataNetwork.EthernetSpeed());
             while (true)
             {
                 var message = new
@@ -103,14 +155,29 @@ namespace Data_collection
                         RamType = DataRam.RamType,
                         RamUsage = DataRam.GetMemoryUsage(),
                         TotalPhisicalMemory = DataRam.GetTotalPhysicalMemory(),
-                    }
-
+                    },
+                    DISK = GetDiskInformation(),
                 };
                 string messageData = JsonConvert.SerializeObject(message, Formatting.Indented);
+                //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+
+                // Console.WriteLine(System.Reflection.Assembly.GetEntryAssembly().Location);//dll
+                try
+                {
+                    Console.WriteLine("Информация о дисках:");
+                    var diskInfo = GetDiskInformation();
+                   
+                }
+                catch (ManagementException e)
+                {
+                    Console.WriteLine("Ошибка WMI: " + e.Message);
+                }
+
 
                 Console.WriteLine(messageData);
 
 
+                
                 try
                 {
 
@@ -141,7 +208,7 @@ namespace Data_collection
                 {
                     Console.WriteLine(ex.Message);
                 }
-                Console.ReadLine();
+                
             }
 
 
