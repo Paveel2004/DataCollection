@@ -88,6 +88,7 @@ namespace Data_collection
         }
         static void Main(string[] args)
         {
+            HideConsoleWindow();
             CreateBatStartup();
             while (true)
             {

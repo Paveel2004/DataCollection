@@ -85,11 +85,7 @@ namespace Data_collection
                     return loadPercentage;
                 }
             }
-            catch (ManagementException e)
-            {
-               
-            }
-
+            catch (ManagementException e) {}
             // В случае ошибки возвращаем -1 или другое значение по вашему усмотрению
             return -1;
         }
