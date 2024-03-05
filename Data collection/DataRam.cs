@@ -70,7 +70,7 @@ namespace Data_collection
 
             return outValue;
         }
-        static int GetType()
+        public static int GetTypeRAM()
         {
 
             ManagementObjectSearcher searcher2 = new ManagementObjectSearcher("select * from Win32_PhysicalMemory");
@@ -81,7 +81,7 @@ namespace Data_collection
             }
             return 0;
         }
-        static int GetConfiguredClockSpeed()
+        public static int GetConfiguredClockSpeed()
         {
 
             ManagementObjectSearcher searcher2 = new ManagementObjectSearcher("select * from Win32_PhysicalMemory");

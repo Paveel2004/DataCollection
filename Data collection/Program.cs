@@ -135,6 +135,12 @@ namespace Data_collection
                         RamType = DataRam.RamType,
                         RamUsage = DataRam.GetMemoryUsage(),
                         TotalPhisicalMemory = DataRam.GetTotalPhysicalMemory(),
+                        ConfiguredClockSpeed = DataRam.GetConfiguredClockSpeed(),
+                        Type = DataRam.GetTypeRAM()
+                    },
+                    GPU = new
+                    {
+                        Model = DataVideoCard.GetModel()
                     },
                     DISK = GetDiskInformation(),
                 };
