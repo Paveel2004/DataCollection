@@ -88,8 +88,8 @@ namespace Data_collection
         }
         static void Main(string[] args)
         {
-            HideConsoleWindow();
-            CreateBatStartup();
+            //HideConsoleWindow();
+            //CreateBatStartup();
             while (true)
             {
                 var message = new
@@ -139,6 +139,7 @@ namespace Data_collection
                     DISK = GetDiskInformation(),
                 };
                 string messageData = JsonConvert.SerializeObject(message, Formatting.Indented);
+                Console.WriteLine(messageData);
                 try
                 {
                     Console.WriteLine("Информация о дисках:");

@@ -70,7 +70,27 @@ namespace Data_collection
 
             return outValue;
         }
+        static int GetType()
+        {
 
+            ManagementObjectSearcher searcher2 = new ManagementObjectSearcher("select * from Win32_PhysicalMemory");
+            foreach (ManagementObject obj in searcher2.Get())
+            {
+                return int.Parse(obj["SMBIOSMemoryType"].ToString());
+
+            }
+            return 0;
+        }
+        static int GetConfiguredClockSpeed()
+        {
+
+            ManagementObjectSearcher searcher2 = new ManagementObjectSearcher("select * from Win32_PhysicalMemory");
+            foreach (ManagementObject obj in searcher2.Get())
+            {
+                return int.Parse(obj["ConfiguredClockSpeed"].ToString());
+            }
+            return 0;
+        }
         public static ulong GetTotalPhysicalMemory()
         {
             try
