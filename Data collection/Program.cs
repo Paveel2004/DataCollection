@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Win32;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+ 
 
 namespace Data_collection
 {
@@ -92,7 +93,7 @@ namespace Data_collection
             //CreateBatStartup();
             while (true)
             {
-                var message = new
+                /*var message = new
                 {
                     CPU = new
                     {
@@ -143,9 +144,9 @@ namespace Data_collection
                         Model = DataVideoCard.GetModel()
                     },
                     DISK = GetDiskInformation(),
-                };
-                string messageData = JsonConvert.SerializeObject(message, Formatting.Indented);
-                Console.WriteLine(messageData);
+                };*/
+                string networkData = JsonHelper.ConvertListToJson(DataNetwork.GetNetworkInterfaces()); 
+              /*
                 try
                 {
                     Console.WriteLine("Информация о дисках:");
@@ -156,7 +157,10 @@ namespace Data_collection
                 {
                     Console.WriteLine("Ошибка WMI: " + e.Message);
                 }
-                Console.WriteLine(messageData);
+                Console.WriteLine(messageData);*/
+                
+                Console.WriteLine(networkData );
+
                 try
                 {
                     string jsonFilePath = @"C:\Users\ASUS\source\repos\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
@@ -168,7 +172,7 @@ namespace Data_collection
                     string serverAddress = adress.serverAddress;
                     int port = adress.port;
 
-                    // Создаем TcpClient и подключаемся к серверу
+                    // Создаем TcpCliXent и подключаемся к серверу
                     using TcpClient client = new TcpClient(serverAddress, port);
                     Console.WriteLine("Подключено к серверу...");
 
@@ -177,9 +181,9 @@ namespace Data_collection
 
                     // Отправляем сообщение серверу
 
-                    byte[] data = Encoding.UTF8.GetBytes(messageData);
+                    byte[] data = Encoding.UTF8.GetBytes(networkData);
                     stream.Write(data, 0, data.Length);
-                    Console.WriteLine($"Отправлено сообщение: {messageData}");
+                    Console.WriteLine($"Отправлено сообщение: {networkData}");
                     Thread.Sleep(5000);
 
                     // Читаем ответ от сервера

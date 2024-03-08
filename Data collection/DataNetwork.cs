@@ -1,8 +1,11 @@
-﻿using System;
+﻿using GlobalClass;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,7 +49,7 @@ namespace Data_collection
 
             return "N/A";
         }
-
+        
         public static double EthernetSpeed()
         {
             var nics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
@@ -98,6 +101,42 @@ namespace Data_collection
             // Если не удалось получить IP-адрес, возвращаем "N/A" или другое значение по вашему усмотрению
             return "N/A";
         }
-        
+        public static List<NetworkInterfaceData> GetNetworkInterfaces()
+        {
+            List<NetworkInterfaceData> networkInterfaces = new List<NetworkInterfaceData>();
+            ManagementObjectSearcher searcher2 = new ManagementObjectSearcher("SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID != NULL");
+
+            foreach (ManagementObject obj in searcher2.Get())
+            {
+                string name = obj["Name"].ToString();
+                string type = obj["NetConnectionID"].ToString();
+                string macAddress = obj["MACAddress"].ToString();
+
+
+                networkInterfaces.Add(new NetworkInterfaceData(name, type, macAddress));
+            }
+            return networkInterfaces;
+        }
+
+        public static List<Dictionary<string, string>> GetMacAddressesAndDescriptions()
+        {
+            var result = new List<Dictionary<string, string>>();
+            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_NetworkAdapterConfiguration");
+
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                if (obj["MACAddress"] != null)
+                {
+                    var data = new Dictionary<string, string>
+                    {
+                        {"Description", obj["Description"].ToString()},
+                        {"MAC Address", obj["MACAddress"].ToString()}
+                    };
+                    result.Add(data);
+                }
+
+            }
+            return result;
+        }
     }
 }

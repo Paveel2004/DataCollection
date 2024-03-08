@@ -15,4 +15,8 @@
     <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\ClientS6\Class\GlobalClass.csproj" />
+  </ItemGroup>
+
 </Project>
