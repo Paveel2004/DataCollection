@@ -9,7 +9,7 @@ using System.Text;
 using Microsoft.Win32;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
- 
+using GlobalClass;
 
 namespace Data_collection
 {
@@ -93,59 +93,13 @@ namespace Data_collection
             //CreateBatStartup();
             while (true)
             {
-                /*var message = new
-                {
-                    CPU = new
-                    {
-                        Architecture = DataCPU.GetProcessorArchitecture(),
-                        Name = DataCPU.GetProcessorName(),
-                        CoreCount = DataCPU.GetProcessorCoreCount(),
-                        Temperature = DataCPU.GetProcessorTemperature(),
-                        SerialNumber = DataCPU.GetProcessorNum(),
-                        CpuUsage = DataCPU.GetCpuUsage()
-                    },
-                    OS = new
-                    {
-                        OS = DataOS.GetOperatingSystem(),
-                        Architecture = DataOS.GetSystemBitArchitecture(),
-                        SerialNumber = DataOS.GetOperatingSystemSerialNumber(),
-                        NumberOfUsers = DataOS.GetNumberOfUsers(),
-                        SystemState = DataOS.GetSystemState(),
-                        VersionOS = DataOS.GetOperatingSystemVersion(),
 
-                    },
-                    BIOS = new
-                    {
-                        SerialNumber = DataBIOS.GetBiosSerialNumber(),
-                        BiosVeesion = DataBIOS.GetBiosVersion()
-                    },
-                    USER = new
-                    {
-                        UserName = DataUser.GetUserName(),
-                        UserSID = DataUser.GetUserSID(),
-                        UserState = DataUser.GetUserStatus()
-                    },
-                    NETWORK = new
-                    {
-                        IP = DataNetwork.GetIPAddress(),
-                        MAC = DataNetwork.GetPhysicalMacAddress(),
-                        EthernetSpeed = DataNetwork.EthernetSpeed(),
-                    },
-                    RAM = new
-                    {
-                        RamType = DataRam.RamType,
-                        RamUsage = DataRam.GetMemoryUsage(),
-                        TotalPhisicalMemory = DataRam.GetTotalPhysicalMemory(),
-                        ConfiguredClockSpeed = DataRam.GetConfiguredClockSpeed(),
-                        Type = DataRam.GetTypeRAM()
-                    },
-                    GPU = new
-                    {
-                        Model = DataVideoCard.GetModel()
-                    },
-                    DISK = GetDiskInformation(),
-                };*/
-                string networkData = JsonHelper.ConvertListToJson(DataNetwork.GetNetworkInterfaces()); 
+                DeviceData<NetworkInterfaceData> networkData = new();
+                networkData.Data = DataNetwork.GetNetworkInterfaces();
+                networkData.SerialNumberBIOS = DataBIOS.GetBiosSerialNumber();
+                string jsonNetworkData = JsonHelper.SerializeDeviceData(networkData);
+
+                
               /*
                 try
                 {
@@ -159,7 +113,7 @@ namespace Data_collection
                 }
                 Console.WriteLine(messageData);*/
                 
-                Console.WriteLine(networkData );
+                //Console.WriteLine(jsonNetworkData);
 
                 try
                 {
@@ -181,9 +135,9 @@ namespace Data_collection
 
                     // Отправляем сообщение серверу
 
-                    byte[] data = Encoding.UTF8.GetBytes(networkData);
+                    byte[] data = Encoding.UTF8.GetBytes(jsonNetworkData);
                     stream.Write(data, 0, data.Length);
-                    Console.WriteLine($"Отправлено сообщение: {networkData}");
+                    Console.WriteLine($"Отправлено сообщение: {jsonNetworkData}");
                     Thread.Sleep(5000);
 
                     // Читаем ответ от сервера
