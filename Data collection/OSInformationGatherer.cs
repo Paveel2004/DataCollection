@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Data_collection
 {
-    static class DataOS
+    static class OSInformationGatherer
     {
         public static string GetStartupFolderPath()
         {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Data_collection
 {
-    internal class DataBIOS
+    internal class InformationGathererBIOS
     {
         public static string GetBiosSerialNumber()
         {

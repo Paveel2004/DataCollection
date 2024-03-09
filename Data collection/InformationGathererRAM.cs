@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace Data_collection
 {
-    public class DataRam
+    public class InformationGathererRAM
     {
         public static string RamType
         {

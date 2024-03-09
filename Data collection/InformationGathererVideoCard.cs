@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Data_collection
 {
-    internal class DataVideoCard
+    internal class InformationGathererVideoCard
     {
         public static string GetModel()
         {

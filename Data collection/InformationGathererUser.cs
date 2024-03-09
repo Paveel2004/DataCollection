@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Data_collection
 {
-    internal class DataUser
+    internal class InformationGathererUser
     {
         public static string GetUserName()
         {

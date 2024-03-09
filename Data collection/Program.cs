@@ -127,9 +127,11 @@ namespace Data_collection
                     string jsonContent = File.ReadAllText(jsonFilePath);
                     Server adress = JsonConvert.DeserializeObject<Server>(jsonContent);
 
-                    DeviceData<NetworkInterfaceData> networkData = new();
-                    networkData.Data = DataNetwork.GetNetworkInterfaces();
-                    networkData.SerialNumberBIOS = DataBIOS.GetBiosSerialNumber();
+                    DeviceData<NetworkInterfaceData> networkData = new()
+                    {
+                        Data = NetworkInformationGatherer.GetNetworkInterfaces(),
+                        SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber()
+                    };
                     string jsonNetworkData = JsonHelper.SerializeDeviceData(networkData);
 
              

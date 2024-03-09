@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Management;
 namespace Data_collection
 {
-    internal static class DataCPU
+    internal static class InformationGathererCPU
     {
         public static string GetProcessorArchitecture()
         { 

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Data_collection
 {
-    internal class DataNetwork
+    internal class NetworkInformationGatherer
     {
         public static string GetMacAddress()
         {

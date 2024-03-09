@@ -8,7 +8,7 @@ using System.Management;
 
 namespace Data_collection
 {
-    internal class DataProcess
+    internal class InformationGathererProcess
     {
         public class ProvessInfo
         {
@@ -26,10 +26,10 @@ namespace Data_collection
 
         public List<ProvessInfo> closeProcess = new List<ProvessInfo>();
 
-        public List<Process> GetPrcessList()
+        public List<System.Diagnostics.Process> GetPrcessList()
         {
-            List<Process> list = new List<Process>();
-            foreach (var process in Process.GetProcesses())
+            List<System.Diagnostics.Process> list = new List<System.Diagnostics.Process>();
+            foreach (var process in System.Diagnostics.Process.GetProcesses())
             {
                 try
                 {
