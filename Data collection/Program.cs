@@ -134,7 +134,7 @@ namespace Data_collection
 
              
                     string serverAddress = adress.serverAddress;              
-                    SendMessage(serverAddress, 9993, jsonContent);
+                    SendMessage(serverAddress, 9993, jsonNetworkData);
 
                    
                 }
