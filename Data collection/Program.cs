@@ -87,64 +87,56 @@ namespace Data_collection
 
             return diskInfo;
         }
+        static void SendMessage(string serverAddress, int port, string message)
+        {
+            try
+            {
+                // Создаем TcpClient и подключаемся к серверу
+                using TcpClient client = new TcpClient(serverAddress, port);
+                Console.WriteLine($"Подключено к серверу на порту {port}...");
+
+                // Получаем поток для обмена данными с сервером
+                using NetworkStream stream = client.GetStream();
+
+                // Отправляем сообщение серверу
+                byte[] data = Encoding.UTF8.GetBytes(message);
+                stream.Write(data, 0, data.Length);
+                Console.WriteLine($"Отправлено сообщение: {message}");
+
+                // Читаем ответ от сервера
+                data = new byte[256];
+                int bytesRead = stream.Read(data, 0, data.Length);
+                string response = Encoding.UTF8.GetString(data, 0, bytesRead);
+                Console.WriteLine($"Ответ от сервера: {response}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
         static void Main(string[] args)
         {
             //HideConsoleWindow();
             //CreateBatStartup();
             while (true)
             {
-
-                DeviceData<NetworkInterfaceData> networkData = new();
-                networkData.Data = DataNetwork.GetNetworkInterfaces();
-                networkData.SerialNumberBIOS = DataBIOS.GetBiosSerialNumber();
-                string jsonNetworkData = JsonHelper.SerializeDeviceData(networkData);
-
-                
-              /*
                 try
                 {
-                    Console.WriteLine("Информация о дисках:");
-                    var diskInfo = GetDiskInformation();
 
-                }
-                catch (ManagementException e)
-                {
-                    Console.WriteLine("Ошибка WMI: " + e.Message);
-                }
-                Console.WriteLine(messageData);*/
-                
-                //Console.WriteLine(jsonNetworkData);
-
-                try
-                {
                     string jsonFilePath = @"C:\Users\ASUS\source\repos\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
                     string jsonContent = File.ReadAllText(jsonFilePath);
-
                     Server adress = JsonConvert.DeserializeObject<Server>(jsonContent);
 
+                    DeviceData<NetworkInterfaceData> networkData = new();
+                    networkData.Data = DataNetwork.GetNetworkInterfaces();
+                    networkData.SerialNumberBIOS = DataBIOS.GetBiosSerialNumber();
+                    string jsonNetworkData = JsonHelper.SerializeDeviceData(networkData);
 
-                    string serverAddress = adress.serverAddress;
-                    int port = adress.port;
+             
+                    string serverAddress = adress.serverAddress;              
+                    SendMessage(serverAddress, 9993, jsonContent);
 
-                    // Создаем TcpCliXent и подключаемся к серверу
-                    using TcpClient client = new TcpClient(serverAddress, port);
-                    Console.WriteLine("Подключено к серверу...");
-
-                    // Получаем поток для обмена данными с сервером
-                    using NetworkStream stream = client.GetStream();
-
-                    // Отправляем сообщение серверу
-
-                    byte[] data = Encoding.UTF8.GetBytes(jsonNetworkData);
-                    stream.Write(data, 0, data.Length);
-                    Console.WriteLine($"Отправлено сообщение: {jsonNetworkData}");
-                    Thread.Sleep(5000);
-
-                    // Читаем ответ от сервера
-                    data = new byte[5000];
-                    int bytesRead = stream.Read(data, 0, data.Length);
-                    string response = Encoding.UTF8.GetString(data, 0, bytesRead);
-                    Console.WriteLine($"Ответ от сервера: {response}");
+                   
                 }
                 catch (Exception ex)
                 {
@@ -152,8 +144,6 @@ namespace Data_collection
                 }
 
             }
-            
-
         }
     }
 
