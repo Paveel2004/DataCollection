@@ -14,6 +14,7 @@ using GlobalClass.Dynamic_data;
 using GlobalClass;
 using System.Runtime.CompilerServices;
 using System.CodeDom;
+using System.Reflection;
 
 namespace Data_collection
 {
@@ -119,22 +120,36 @@ namespace Data_collection
                 Console.WriteLine(ex.Message);
             }
         }
-        static void SendMessageUsage<T>(string serverAddress, int port, string message, ref string lastWorkload)
+        static void SendMessageUsage<T>(string serverAddress, int port, string message)
         {
             T obj = JsonConvert.DeserializeObject<T>(message);
             var type = typeof(T);
-            var property = type.GetProperty("Workload");
+            PropertyInfo property;
 
-            string currentWorkload = property.GetValue(obj)?.ToString();
-
-            if (lastWorkload != currentWorkload)
-            {
-                SendMessage(serverAddress, port, message);
-                lastWorkload = currentWorkload;
+            if (obj is UsageRAM) {
+                property = type.GetProperty("Workload");
+                string currentWorkload = property.GetValue(obj)?.ToString();
+                if (lastUsageRam != currentWorkload)
+                {
+                    SendMessage(serverAddress, port, message);
+                    lastUsageRam = currentWorkload;
+                }
             }
+            if (obj is UsageOS) 
+            {
+                property = type.GetProperty("Status");
+                string currentStatus = property.GetValue(obj)?.ToString();
+                if(lastUsageOS != currentStatus)
+                {
+                    SendMessage(serverAddress, port, message);
+                    lastUsageOS = currentStatus;
+                }
+            }        
+            
+      
         }
         private static string lastUsageRam = null;
-        private static string lastWorkload = null;
+        private static string lastUsageOS = null;
         static void Main(string[] args)
         {
             //HideConsoleWindow();
@@ -167,12 +182,13 @@ namespace Data_collection
                     SendMessage(serverAddress, 9930, JsonHelper.SerializeDeviceData(networkData));
                     SendMessage(serverAddress, 9860, JsonHelper.SerializeDeviceData(DataCPU));
                     SendMessage(serverAddress, 9790, JsonHelper.SerializeDeviceData(DataRAM));
+
                  
         
                     while (true)
                     {
-                        SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())), ref lastUsageRam);
-                    
+                        SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())));
+                        SendMessageUsage<UsageOS>(serverAddress, 9650, JsonConvert.SerializeObject(new UsageOS(InformationGathererUser.GetUserName(), OSInformationGatherer.GetSystemState(), InformationGathererBIOS.GetBiosSerialNumber())));
                     }            
                 }
                 catch (Exception ex)

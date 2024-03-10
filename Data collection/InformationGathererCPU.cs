@@ -120,7 +120,8 @@ namespace Data_collection
             {
                 string model = obj["Name"].ToString();
                 string architecture = GetArchitecture((ushort)obj["Architecture"]);
-                cpu.Add(new CPUData(model, architecture));
+                int numberOfCores = Convert.ToInt32(obj["NumberOfCores"]);
+                cpu.Add(new CPUData(model, architecture,numberOfCores));
             }
             return cpu;
         }
