@@ -163,13 +163,15 @@ namespace Data_collection
                         Data = InformationGathererRAM.GetRAM()
                     };
                     string serverAddress = adress.serverAddress;
-     
-                    SendMessage(serverAddress, 1111, JsonHelper.SerializeDeviceData(DataRAM));
-                    SendMessage(serverAddress, 9986, JsonHelper.SerializeDeviceData(DataCPU));
-                    SendMessage(serverAddress, 9993, JsonHelper.SerializeDeviceData(networkData));
+
+                    SendMessage(serverAddress, 9930, JsonHelper.SerializeDeviceData(networkData));
+                    SendMessage(serverAddress, 9790, JsonHelper.SerializeDeviceData(DataRAM));
+                    SendMessage(serverAddress, 9860, JsonHelper.SerializeDeviceData(DataCPU));
+        
                     while (true)
                     {
-                        SendMessageUsage<UsageRAM>(serverAddress, 2222, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())), ref lastUsageRam);
+                        SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())), ref lastUsageRam);
+                    
                     }            
                 }
                 catch (Exception ex)
