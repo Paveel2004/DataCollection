@@ -119,8 +119,6 @@ namespace Data_collection
         {
             //HideConsoleWindow();
             //CreateBatStartup();
-            while (true)
-            {
                 try
                 {
 
@@ -138,18 +136,22 @@ namespace Data_collection
                         SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(),
                         Data = InformationGathererCPU.GetCPU()
                     };
+                    DeviceData<RAMData> DataRAM = new()
+                    {
+                        SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(),
+                        Data = InformationGathererRAM.GetRAM()
+                    };
                     string serverAddress = adress.serverAddress;
+                    SendMessage(serverAddress, 1111, JsonHelper.SerializeDeviceData(DataRAM));
                     SendMessage(serverAddress, 9986, JsonHelper.SerializeDeviceData(DataCPU));
                     SendMessage(serverAddress, 9993, JsonHelper.SerializeDeviceData(networkData));
 
-                   
+
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
-
-            }
         }
     }
 

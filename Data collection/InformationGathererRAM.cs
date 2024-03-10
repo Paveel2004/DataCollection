@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using GlobalClass.Static_data;
+using System.Runtime.CompilerServices;
 
 namespace Data_collection
 {
@@ -121,7 +123,7 @@ namespace Data_collection
                 {
                     return counter.NextValue();
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -129,7 +131,20 @@ namespace Data_collection
             }
 
         }
+        public static List<RAMData> GetRAM()
+        {
+            List<RAMData> RAMs = new List<RAMData>();
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_PhysicalMemory");
+
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                string Type = obj["SMBIOSMemoryType"].ToString();
+                ulong Volume = GetTotalPhysicalMemory();
+                int Speed = int.Parse(obj["Speed"].ToString());
+                RAMs.Add(new RAMData(Type, Volume, Speed));
+            }
+            return RAMs;
+        }
 
     }
-
 }
