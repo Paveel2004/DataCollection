@@ -165,8 +165,9 @@ namespace Data_collection
                     string serverAddress = adress.serverAddress;
 
                     SendMessage(serverAddress, 9930, JsonHelper.SerializeDeviceData(networkData));
-                    SendMessage(serverAddress, 9790, JsonHelper.SerializeDeviceData(DataRAM));
                     SendMessage(serverAddress, 9860, JsonHelper.SerializeDeviceData(DataCPU));
+                    SendMessage(serverAddress, 9790, JsonHelper.SerializeDeviceData(DataRAM));
+                 
         
                     while (true)
                     {
