@@ -10,6 +10,7 @@ using Microsoft.Win32;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using GlobalClass.Static_data;
+using GlobalClass.Dynamic_data;
 using GlobalClass;
 
 namespace Data_collection
@@ -142,12 +143,16 @@ namespace Data_collection
                         Data = InformationGathererRAM.GetRAM()
                     };
                     string serverAddress = adress.serverAddress;
+     
                     SendMessage(serverAddress, 1111, JsonHelper.SerializeDeviceData(DataRAM));
                     SendMessage(serverAddress, 9986, JsonHelper.SerializeDeviceData(DataCPU));
                     SendMessage(serverAddress, 9993, JsonHelper.SerializeDeviceData(networkData));
+                    while (true)
+                    {
+                        SendMessage(serverAddress, 2222, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())));
+                    }            
 
-
-                }
+            }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);

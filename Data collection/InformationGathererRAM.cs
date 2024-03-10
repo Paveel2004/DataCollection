@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using GlobalClass.Static_data;
 using System.Runtime.CompilerServices;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Data_collection
 {
@@ -129,8 +130,38 @@ namespace Data_collection
             {
                 return 0;
             }
-
         }
+        static double FreeRAM()
+        {
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem");
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                return Convert.ToDouble(obj["FreePhysicalMemory"]) / Math.Pow(1024, 2); // в гигабайтах
+            }
+            return 0;
+        }
+
+        static double GetTotalPhysicalMemoryToGB()
+        {
+            try
+            {
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT TotalPhysicalMemory FROM Win32_ComputerSystem");
+                ManagementObjectCollection collection = searcher.Get();
+
+                foreach (ManagementObject obj in collection)
+                {
+                    ulong totalMemoryBytes = Convert.ToUInt64(obj["TotalPhysicalMemory"]);
+                    return totalMemoryBytes / Math.Pow(1024, 3); // преобразование в гигабайты
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при получении объема оперативной памяти: {ex.Message}");
+            }
+
+            return 0;
+        }
+        public static double GetUsageRam() => (1 - (FreeRAM() / GetTotalPhysicalMemoryToGB())) * 100;
         public static List<RAMData> GetRAM()
         {
             List<RAMData> RAMs = new List<RAMData>();
