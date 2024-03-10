@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Management;
+using GlobalClass.Static_data;
 namespace Data_collection
 {
     internal static class InformationGathererCPU
@@ -110,6 +111,32 @@ namespace Data_collection
                 return e.Message;
             }
             return "";
+        }
+        public static List<CPUData> GetCPU()
+        {
+            List<CPUData> cpu = new List<CPUData>();
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_Processor");
+            foreach(ManagementObject obj in searcher.Get())
+            {
+                string model = obj["Name"].ToString();
+                string architecture = GetArchitecture((ushort)obj["Architecture"]);
+                cpu.Add(new CPUData(model, architecture));
+            }
+            return cpu;
+        }
+        private static string GetArchitecture(ushort code)
+        {
+            switch (code)
+            {
+                case 0: return "x86";
+                case 1: return "MIPS";
+                case 2: return "Alpha";
+                case 3: return "PowerPC";
+                case 5: return "ARM";
+                case 6: return "Itanium-based systems";
+                case 9: return "x64";
+                default: return "Unknown";
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Management;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
-
+using GlobalClass.Static_data;
 namespace Data_collection
 {
     internal class NetworkInformationGatherer

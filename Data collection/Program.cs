@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Win32;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using GlobalClass.Static_data;
 using GlobalClass;
 
 namespace Data_collection
@@ -126,17 +127,20 @@ namespace Data_collection
                     string jsonFilePath = @"C:\Users\ASUS\source\repos\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
                     string jsonContent = File.ReadAllText(jsonFilePath);
                     Server adress = JsonConvert.DeserializeObject<Server>(jsonContent);
-
                     DeviceData<NetworkInterfaceData> networkData = new()
                     {
                         Data = NetworkInformationGatherer.GetNetworkInterfaces(),
                         SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber()
                     };
-                    string jsonNetworkData = JsonHelper.SerializeDeviceData(networkData);
 
-             
-                    string serverAddress = adress.serverAddress;              
-                    SendMessage(serverAddress, 9993, jsonNetworkData);
+                    DeviceData<CPUData> DataCPU = new()
+                    {
+                        SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(),
+                        Data = InformationGathererCPU.GetCPU()
+                    };
+                    string serverAddress = adress.serverAddress;
+                    SendMessage(serverAddress, 9986, JsonHelper.SerializeDeviceData(DataCPU));
+                    SendMessage(serverAddress, 9993, JsonHelper.SerializeDeviceData(networkData));
 
                    
                 }
