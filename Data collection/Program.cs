@@ -12,6 +12,8 @@ using System.Security.Cryptography.X509Certificates;
 using GlobalClass.Static_data;
 using GlobalClass.Dynamic_data;
 using GlobalClass;
+using System.Runtime.CompilerServices;
+using System.CodeDom;
 
 namespace Data_collection
 {
@@ -89,6 +91,7 @@ namespace Data_collection
 
             return diskInfo;
         }
+
         static void SendMessage(string serverAddress, int port, string message)
         {
             try
@@ -116,10 +119,27 @@ namespace Data_collection
                 Console.WriteLine(ex.Message);
             }
         }
+        static void SendMessageUsage<T>(string serverAddress, int port, string message, ref string lastWorkload)
+        {
+            T obj = JsonConvert.DeserializeObject<T>(message);
+            var type = typeof(T);
+            var property = type.GetProperty("Workload");
+
+            string currentWorkload = property.GetValue(obj)?.ToString();
+
+            if (lastWorkload != currentWorkload)
+            {
+                SendMessage(serverAddress, port, message);
+                lastWorkload = currentWorkload;
+            }
+        }
+        private static string lastUsageRam = null;
+        private static string lastWorkload = null;
         static void Main(string[] args)
         {
             //HideConsoleWindow();
             //CreateBatStartup();
+          
                 try
                 {
 
@@ -149,10 +169,9 @@ namespace Data_collection
                     SendMessage(serverAddress, 9993, JsonHelper.SerializeDeviceData(networkData));
                     while (true)
                     {
-                        SendMessage(serverAddress, 2222, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())));
+                        SendMessageUsage<UsageRAM>(serverAddress, 2222, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())), ref lastUsageRam);
                     }            
-
-            }
+                }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);

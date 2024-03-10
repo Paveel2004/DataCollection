@@ -161,7 +161,7 @@ namespace Data_collection
 
             return 0;
         }
-        public static double GetUsageRam() => (1 - (FreeRAM() / GetTotalPhysicalMemoryToGB())) * 100;
+        public static double GetUsageRam() => Math.Round((1 - (FreeRAM() / GetTotalPhysicalMemoryToGB())) * 100);
         public static List<RAMData> GetRAM()
         {
             List<RAMData> RAMs = new List<RAMData>();
