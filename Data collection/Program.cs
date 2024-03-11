@@ -162,9 +162,19 @@ namespace Data_collection
                     lastUsageCPU = currentStatus;
                 }
             }
-
+            if(obj is UsageEthernet) 
+            {
+                property = type.GetProperty("Speed");
+                string cerrentSpeed = property.GetValue(obj)?.ToString();
+                if (lastEthernetSpeed != cerrentSpeed)
+                {
+                    SendMessage(serverAddress, port, message);
+                    lastEthernetSpeed = cerrentSpeed;
+                }
+            }
 
         }
+        private static string lastEthernetSpeed = null;
         private static string lastUsageRam = null;
         private static string lastUsageOS = null;
         private static string lastUsageCPU = null;
@@ -206,6 +216,8 @@ namespace Data_collection
                         SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())));
                         SendMessageUsage<UsageOS>(serverAddress, 9650, JsonConvert.SerializeObject(new UsageOS(InformationGathererUser.GetUserName(), OSInformationGatherer.GetSystemState(), InformationGathererBIOS.GetBiosSerialNumber())));
                         SendMessageUsage<UsageCPU>(serverAddress, 9580, JsonConvert.SerializeObject(new UsageCPU(InformationGathererCPU.GetProcessorTemperature(), InformationGathererCPU.GetCpuUsage(), InformationGathererBIOS.GetBiosSerialNumber())));
+                        SendMessageUsage<UsageEthernet>(serverAddress, 9510, JsonConvert.SerializeObject(new UsageEthernet(NetworkInformationGatherer.EthernetSpeed(), InformationGathererBIOS.GetBiosSerialNumber())));
+                        
                     }            
                 }
                 catch (Exception ex)
