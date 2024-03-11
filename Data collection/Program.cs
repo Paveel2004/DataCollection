@@ -15,6 +15,7 @@ using GlobalClass;
 using System.Runtime.CompilerServices;
 using System.CodeDom;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 
 namespace Data_collection
 {
@@ -144,12 +145,29 @@ namespace Data_collection
                     SendMessage(serverAddress, port, message);
                     lastUsageOS = currentStatus;
                 }
-            }        
-            
-      
+            }
+            if (obj is UsageCPU)
+            {
+                var property2 = type.GetProperty("Temperature");
+                property = type.GetProperty("Workload");
+
+                string currentTemperature = property2.GetValue(obj)?.ToString();
+
+                string currentWorkload = property.GetValue(obj)?.ToString();
+
+                string currentStatus = currentWorkload + '|' + currentTemperature;
+                if (lastUsageCPU != currentStatus)
+                {
+                    SendMessage(serverAddress, port, message);
+                    lastUsageCPU = currentStatus;
+                }
+            }
+
+
         }
         private static string lastUsageRam = null;
         private static string lastUsageOS = null;
+        private static string lastUsageCPU = null;
         static void Main(string[] args)
         {
             //HideConsoleWindow();
@@ -183,12 +201,11 @@ namespace Data_collection
                     SendMessage(serverAddress, 9860, JsonHelper.SerializeDeviceData(DataCPU));
                     SendMessage(serverAddress, 9790, JsonHelper.SerializeDeviceData(DataRAM));
 
-                 
-        
                     while (true)
                     {
                         SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(),InformationGathererBIOS.GetBiosSerialNumber())));
                         SendMessageUsage<UsageOS>(serverAddress, 9650, JsonConvert.SerializeObject(new UsageOS(InformationGathererUser.GetUserName(), OSInformationGatherer.GetSystemState(), InformationGathererBIOS.GetBiosSerialNumber())));
+                        SendMessageUsage<UsageCPU>(serverAddress, 9580, JsonConvert.SerializeObject(new UsageCPU(InformationGathererCPU.GetProcessorTemperature(), InformationGathererCPU.GetCpuUsage(), InformationGathererBIOS.GetBiosSerialNumber())));
                     }            
                 }
                 catch (Exception ex)
