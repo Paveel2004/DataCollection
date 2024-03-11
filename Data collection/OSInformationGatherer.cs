@@ -39,6 +39,19 @@ namespace Data_collection
 
             return "Unknown";
         }
+        public static string GetComputerName()
+        {
+            string query = "SELECT Name FROM Win32_ComputerSystem";
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+            ManagementObjectCollection queryCollection = searcher.Get();
+
+            foreach (ManagementObject m in queryCollection)
+            {
+                return m["Name"]?.ToString() ?? "Unknown";
+            }
+
+            return "Unknown";
+        }
         public static int GetSystemBitArchitecture()
         {
             const string registryKeyPath = @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment";
