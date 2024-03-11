@@ -64,8 +64,19 @@ namespace Data_collection.Connection
                     lastEthernetSpeed = cerrentSpeed;
                 }
             }
+            if (obj is UsageDisk)
+            {
+                property = type.GetProperty("FreeSpace");
+                string cerrentFreeSpace = property.GetValue(obj)?.ToString();
+                if (lastUsageDisk != cerrentFreeSpace)
+                {
+                    SendMessage(serverAddress, port, message);
+                    lastUsageDisk = cerrentFreeSpace;
+                }
+            }
 
         }
+        private static string lastUsageDisk = null;
         private static string lastEthernetSpeed = null;
         private static string lastUsageRam = null;
         private static string lastUsageOS = null;
