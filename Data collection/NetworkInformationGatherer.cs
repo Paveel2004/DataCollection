@@ -52,31 +52,34 @@ namespace Data_collection
         
         public static double EthernetSpeed()
         {
-            var nics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
-            // Select desired NIC
-            var nic = nics.SingleOrDefault(n => n.Name == "Ethernet");
+            try
+            {
+                var nics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+                // Select desired NIC
+                var nic = nics.SingleOrDefault(n => n.Name == "Ethernet");
 
 
-            var reads = Enumerable.Empty<double>();
-            var sw = new Stopwatch();
-            var lastBr = nic.GetIPv4Statistics().BytesReceived;
+                var reads = Enumerable.Empty<double>();
+                var sw = new Stopwatch();
+                var lastBr = nic.GetIPv4Statistics().BytesReceived;
 
-            sw.Restart();
-            Thread.Sleep(100);
-            var elapsed = sw.Elapsed.TotalSeconds;
-            var br = nic.GetIPv4Statistics().BytesReceived;
+                sw.Restart();
+                Thread.Sleep(100);
+                var elapsed = sw.Elapsed.TotalSeconds;
+                var br = nic.GetIPv4Statistics().BytesReceived;
 
-            var local = (br - lastBr) / elapsed;
-            lastBr = br;
+                var local = (br - lastBr) / elapsed;
+                lastBr = br;
 
-            // Keep last 20, ~2 seconds
-            reads = new[] { local }.Concat(reads).Take(20);
+                // Keep last 20, ~2 seconds
+                reads = new[] { local }.Concat(reads).Take(20);
 
 
-            var bSec = reads.Sum() / reads.Count();
-            var kbs = (bSec * 8) / 1024;
+                var bSec = reads.Sum() / reads.Count();
+                var kbs = (bSec * 8) / 1024;
 
-            return kbs;
+                return kbs;
+            }catch (Exception ex) { return -1; }
 
 
         }

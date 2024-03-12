@@ -60,14 +60,20 @@ namespace Data_collection
 
         public static double GetProcessorTemperature() 
         {
-            Double CPUtprt = 0;
-            ManagementObjectSearcher mos = new ManagementObjectSearcher(@"root\WMI", "SELECT * FROM MSAcpi_ThermalZoneTemperature");
-            foreach (ManagementObject mo in mos.Get())
+            try
             {
-                CPUtprt = Convert.ToDouble(Convert.ToDouble(mo.GetPropertyValue("CurrentTemperature").ToString()) - 2732) / 10;
-                return CPUtprt;
+
+                Double CPUtprt = 0;
+                ManagementObjectSearcher mos = new ManagementObjectSearcher(@"root\WMI", "SELECT * FROM MSAcpi_ThermalZoneTemperature");
+                foreach (ManagementObject mo in mos.Get())
+                {
+                    CPUtprt = Convert.ToDouble(Convert.ToDouble(mo.GetPropertyValue("CurrentTemperature").ToString()) - 2732) / 10;
+                    return CPUtprt;
+                }
             }
+            catch { return 0; }
             return 0;
+
         }
 
         public static double GetCpuUsage()
