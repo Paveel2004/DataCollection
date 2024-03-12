@@ -1,11 +1,13 @@
-﻿using Microsoft.Win32;
+﻿using GlobalClass.Dynamic_data;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Text;
 using System.Threading.Tasks;
-
+using GlobalClass.Static_data;
 namespace Data_collection
 {
     static class OSInformationGatherer
@@ -25,6 +27,34 @@ namespace Data_collection
                 }
             }
             return null;
+        }
+        private static List<Process> GetProcessesWithWindows()
+        {
+            List<Process> processesWithWindows = new List<Process>();
+            foreach (var process in Process.GetProcesses())
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(process.MainWindowTitle))
+                    {
+                        processesWithWindows.Add(process);
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+            return processesWithWindows;
+        }
+        public static List<WindowData> GetWindows()
+        {
+            List<WindowData> usageWindows = new List<WindowData>();
+            var process = GetProcessesWithWindows();
+            foreach (var i in process)
+            {
+                usageWindows.Add(new WindowData(i.MainWindowTitle));
+            }
+            return usageWindows;
         }
         public static string GetOperatingSystem()
         {

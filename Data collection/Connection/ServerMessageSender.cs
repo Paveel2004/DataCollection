@@ -1,4 +1,5 @@
 ﻿using GlobalClass.Dynamic_data;
+using GlobalClass.Static_data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -73,6 +74,10 @@ namespace Data_collection.Connection
                     SendMessage(serverAddress, port, message);
                     lastUsageDisk = cerrentFreeSpace;
                 }
+            }
+            if (obj is WindowData)
+            {
+
             }
 
         }
