@@ -13,6 +13,37 @@ namespace Data_collection.Connection
 {
     internal static class ServerMessageSender
     {
+        public static void SendMessageWindow(string serverAddress, int port, List<WindowData> message)/////////////////////////////////////////Переделать
+        {
+
+            try
+            {
+                // Создаем TcpClient и подключаемся к серверу
+                using TcpClient client = new TcpClient(serverAddress, port);
+                Console.WriteLine($"Подключено к серверу на порту {port}...");
+
+                // Получаем поток для обмена данными с сервером
+                using NetworkStream stream = client.GetStream();
+
+                // Отправляем сообщение серверу
+                foreach (var i in message)
+                {
+                    byte[] data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(i));
+
+                    stream.Write(data, 0, data.Length);
+                    Console.WriteLine($"Отправлено сообщение: {i}");
+                    // Читаем ответ от сервера
+                    data = new byte[256];
+                    int bytesRead = stream.Read(data, 0, data.Length);
+                    string response = Encoding.UTF8.GetString(data, 0, bytesRead);
+                    Console.WriteLine($"Ответ от сервера: {response}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
         public static void SendMessageUsage<T>(string serverAddress, int port, string message)
         {
             T obj = JsonConvert.DeserializeObject<T>(message);
