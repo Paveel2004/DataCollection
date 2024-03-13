@@ -52,7 +52,7 @@ namespace Data_collection
             var process = GetProcessesWithWindows();
             foreach (var i in process)
             {
-                usageWindows.Add(new WindowData(i.MainWindowTitle));
+                usageWindows.Add(new WindowData(i.MainWindowTitle, InformationGathererBIOS.GetBiosSerialNumber()));
             }
             return usageWindows;
         }

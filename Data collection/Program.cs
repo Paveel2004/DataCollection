@@ -95,13 +95,48 @@ namespace Data_collection
             return diskInfo;
         }
 
+        static void SendMessageWindow(string serverAddress, int port, List<WindowData> message)
+        {
+          
+                try
+                {
+                    // Создаем TcpClient и подключаемся к серверу
+                    using TcpClient client = new TcpClient(serverAddress, port);
+                    Console.WriteLine($"Подключено к серверу на порту {port}...");
+
+                    // Получаем поток для обмена данными с сервером
+                    using NetworkStream stream = client.GetStream();
+
+                    // Отправляем сообщение серверу
+                    foreach (var i in message)
+                    {
+                        byte[] data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(i));
+
+                        stream.Write(data, 0, data.Length);
+                        Console.WriteLine($"Отправлено сообщение: {i}");
+                        // Читаем ответ от сервера
+                        data = new byte[256];
+                        int bytesRead = stream.Read(data, 0, data.Length);
+                        string response = Encoding.UTF8.GetString(data, 0, bytesRead);
+                        Console.WriteLine($"Ответ от сервера: {response}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                //lastWindowMessage = message;
+            
+
+        }
+        //static List<WindowData> lastWindowMessage = new List<WindowData>();
 
 
         static void Main(string[] args)
         {
             //HideConsoleWindow();
             //CreateBatStartup();
-
+          
             try
             {
                 //string jsonFilePath = @". ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
@@ -113,10 +148,13 @@ namespace Data_collection
                 DeviceData<RAMData> DataRAM = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererRAM.GetRAM() };
                 DeviceData<VideoСardData> DataVideoCard = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererVideoCard.GetModels() };
 
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                /*///////////////////////////////////////////////////////////////////////////////////////////////////*/string serverAddress = "127.0.0.1"; ///////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                Console.WriteLine();
+                /////////////////////////////////////////////////////////////////////////////////////////
+                /*///////////////////*/string serverAddress = "192.168.169.240"; /*///////////////////*/
+                ////////////////////////////////////////////////////////////////////////////////////////
+                
+                Console.WriteLine(JsonHelper.SerializeDeviceData(new DeviceData<WindowData> { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = OSInformationGatherer.GetWindows() }));
+                
+
                 ServerMessageSender.SendMessage(serverAddress, 9440, JsonConvert.SerializeObject(new DeviceInitialization(InformationGathererBIOS.GetBiosSerialNumber(), OSInformationGatherer.GetComputerName())));
                 ServerMessageSender.SendMessage(serverAddress, 9930, JsonHelper.SerializeDeviceData(DataNetwork));
                 ServerMessageSender.SendMessage(serverAddress, 9860, JsonHelper.SerializeDeviceData(DataCPU));
@@ -124,6 +162,7 @@ namespace Data_collection
                 ServerMessageSender.SendMessage(serverAddress, 9370, JsonHelper.SerializeDeviceData(DataVideoCard));
                 ServerMessageSender.SendMessage(serverAddress, 9230, JsonConvert.SerializeObject(new DiskData(InformationGathererDisk.TotalSpace(),InformationGathererBIOS.GetBiosSerialNumber())));
                 ServerMessageSender.SendMessage(serverAddress, 9160, JsonConvert.SerializeObject(new OSData(OSInformationGatherer.GetOperatingSystem(), InformationGathererBIOS.GetBiosSerialNumber())));
+                
                 while (true)
                 {
                     ServerMessageSender.SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(), InformationGathererBIOS.GetBiosSerialNumber())));
@@ -131,7 +170,7 @@ namespace Data_collection
                     ServerMessageSender.SendMessageUsage<UsageCPU>(serverAddress, 9580, JsonConvert.SerializeObject(new UsageCPU(InformationGathererCPU.GetProcessorTemperature(), InformationGathererCPU.GetCpuUsage(), InformationGathererBIOS.GetBiosSerialNumber())));
                     ServerMessageSender.SendMessageUsage<UsageEthernet>(serverAddress, 9510, JsonConvert.SerializeObject(new UsageEthernet(NetworkInformationGatherer.EthernetSpeed(), InformationGathererBIOS.GetBiosSerialNumber())));
                     ServerMessageSender.SendMessageUsage<UsageDisk>(serverAddress, 9300, JsonConvert.SerializeObject(new UsageDisk(InformationGathererDisk.TotalFreeSpace(),InformationGathererBIOS.GetBiosSerialNumber())));
-                    ServerMessageSender.SendMessageUsage<WindowData>(serverAddress, 9090, JsonHelper.SerializeDeviceData(new DeviceData<WindowData> { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = OSInformationGatherer.GetWindows() }));
+                    SendMessageWindow(serverAddress, 9090,  OSInformationGatherer.GetWindows() );
                 }
 
             }
