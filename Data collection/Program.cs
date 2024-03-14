@@ -32,9 +32,10 @@ namespace Data_collection
           
             try
             {
-                //string jsonFilePath = @". ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
+                string jsonFilePath = @".\Users\ASUS\source\repos\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
 
-                //string jsonContent = File.ReadAllText(jsonFilePath);
+                string jsonContent = File.ReadAllText(jsonFilePath);
+                dynamic data = JsonConvert.DeserializeObject(jsonContent);
                 //Server adress = JsonConvert.DeserializeObject<Server>(jsonContent);
 
                 DeviceData<NetworkInterfaceData> DataNetwork = new() { Data = NetworkInformationGatherer.GetNetworkInterfaces(), SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber() };
@@ -43,9 +44,11 @@ namespace Data_collection
                 DeviceData<VideoСardData> DataVideoCard = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererVideoCard.GetModels() };
 
                 /////////////////////////////////////////////////////////////////////////////////////////
-                /*///////////////////*/string serverAddress = "192.168.169.240"; /*///////////////////*/
+                /*///////////////////*/
+                string serverAddress = data.serverAddress;
+                /*///////////////////*/
                 ////////////////////////////////////////////////////////////////////////////////////////
-                
+
                 Console.WriteLine(JsonHelper.SerializeDeviceData(new DeviceData<WindowData> { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = OSInformationGatherer.GetWindows() }));
                 
 
