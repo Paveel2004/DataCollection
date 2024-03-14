@@ -27,16 +27,18 @@ namespace Data_collection
        
         static void Main(string[] args)
         {
-            //HideConsoleWindow();
-            //CreateBatStartup();
+            //StartupManager.HideConsoleWindow();
+            //StartupManager.CreateBatStartup();
           
             try
             {
-                string jsonFilePath = @".\Users\ASUS\source\repos\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
+                string jsonFilePath = @"C:\Users\User\Desktop\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
 
                 string jsonContent = File.ReadAllText(jsonFilePath);
                 dynamic data = JsonConvert.DeserializeObject(jsonContent);
-                //Server adress = JsonConvert.DeserializeObject<Server>(jsonContent);
+
+                var obj = JObject.Parse(jsonContent);
+                string serverAddress = (string)obj["serverAddress"];
 
                 DeviceData<NetworkInterfaceData> DataNetwork = new() { Data = NetworkInformationGatherer.GetNetworkInterfaces(), SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber() };
                 DeviceData<CPUData> DataCPU = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererCPU.GetCPU() };
@@ -44,8 +46,8 @@ namespace Data_collection
                 DeviceData<VideoСardData> DataVideoCard = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererVideoCard.GetModels() };
 
                 /////////////////////////////////////////////////////////////////////////////////////////
-                /*///////////////////*/
-                string serverAddress = data.serverAddress;
+                ///////////////////*/
+         
                 /*///////////////////*/
                 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -68,9 +70,9 @@ namespace Data_collection
                     ServerMessageSender.SendMessageUsage<UsageEthernet>(serverAddress, 9510, JsonConvert.SerializeObject(new UsageEthernet(NetworkInformationGatherer.EthernetSpeed(), InformationGathererBIOS.GetBiosSerialNumber())));
                     ServerMessageSender.SendMessageUsage<UsageDisk>(serverAddress, 9300, JsonConvert.SerializeObject(new UsageDisk(InformationGathererDisk.TotalFreeSpace(),InformationGathererBIOS.GetBiosSerialNumber())));
 
-                    //////////////////////////////////////////////// !!!КОСТЫЛЬ!!! /////////////////////////////////////////////////////
-                    ServerMessageSender.SendMessageWindow(serverAddress, 9090,  OSInformationGatherer.GetWindows());
-                    //////////////////////////////////////////////// !!!КОСТЫЛЬ!!! /////////////////////////////////////////////////////
+                    //////////////////////////////////////////////// !!!КОСТЫЛЬ!!! ////////////////////////////////////
+                    ServerMessageSender.SendMessageWindow(serverAddress, 9090,  OSInformationGatherer.GetWindows());//
+                    //////////////////////////////////////////////// !!!КОСТЫЛЬ!!! //////////////////////////////////
                 }
 
             }

@@ -24,7 +24,7 @@ namespace Data_collection
         const int SW_HIDE = 0;
         const int SW_SHOW = 5;
 
-        static void HideConsoleWindow()
+        public static void HideConsoleWindow()
         {
             IntPtr handle = GetConsoleWindow();
             ShowWindow(handle, SW_HIDE);
