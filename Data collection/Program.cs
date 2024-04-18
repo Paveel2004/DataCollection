@@ -32,24 +32,19 @@ namespace Data_collection
           
             try
             {
-                string jsonFilePath = @"C:\Users\User\Desktop\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
+                //tring jsonFilePath = @"C:\Users\User\Desktop\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
 
-                string jsonContent = File.ReadAllText(jsonFilePath);
-                dynamic data = JsonConvert.DeserializeObject(jsonContent);
+               // string jsonContent = File.ReadAllText(jsonFilePath);
+              //  dynamic data = JsonConvert.DeserializeObject(jsonContent);
 
-                var obj = JObject.Parse(jsonContent);
-                string serverAddress = (string)obj["serverAddress"];
+               // var obj = JObject.Parse(jsonContent);
+                string serverAddress = "127.0.0.1";//(string)obj["serverAddress"];
 
                 DeviceData<NetworkInterfaceData> DataNetwork = new() { Data = NetworkInformationGatherer.GetNetworkInterfaces(), SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber() };
                 DeviceData<CPUData> DataCPU = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererCPU.GetCPU() };
                 DeviceData<RAMData> DataRAM = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererRAM.GetRAM() };
                 DeviceData<VideoСardData> DataVideoCard = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererVideoCard.GetModels() };
 
-                /////////////////////////////////////////////////////////////////////////////////////////
-                ///////////////////*/
-         
-                /*///////////////////*/
-                ////////////////////////////////////////////////////////////////////////////////////////
 
                 Console.WriteLine(JsonHelper.SerializeDeviceData(new DeviceData<WindowData> { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = OSInformationGatherer.GetWindows() }));
                 
@@ -62,18 +57,18 @@ namespace Data_collection
                 ServerMessageSender.SendMessage(serverAddress, 9230, JsonConvert.SerializeObject(new DiskData(InformationGathererDisk.TotalSpace(),InformationGathererBIOS.GetBiosSerialNumber())));
                 ServerMessageSender.SendMessage(serverAddress, 9160, JsonConvert.SerializeObject(new OSData(OSInformationGatherer.GetOperatingSystem(), InformationGathererBIOS.GetBiosSerialNumber())));
                 
-                while (true)
-                {
+              /*  while (true)
+                {*/
                     ServerMessageSender.SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(), InformationGathererBIOS.GetBiosSerialNumber())));
                     ServerMessageSender.SendMessageUsage<UsageOS>(serverAddress, 9650, JsonConvert.SerializeObject(new UsageOS(InformationGathererUser.GetUserName(), OSInformationGatherer.GetSystemState(), InformationGathererBIOS.GetBiosSerialNumber())));
                     ServerMessageSender.SendMessageUsage<UsageCPU>(serverAddress, 9580, JsonConvert.SerializeObject(new UsageCPU(InformationGathererCPU.GetProcessorTemperature(), InformationGathererCPU.GetCpuUsage(), InformationGathererBIOS.GetBiosSerialNumber())));
                     ServerMessageSender.SendMessageUsage<UsageEthernet>(serverAddress, 9510, JsonConvert.SerializeObject(new UsageEthernet(NetworkInformationGatherer.EthernetSpeed(), InformationGathererBIOS.GetBiosSerialNumber())));
                     ServerMessageSender.SendMessageUsage<UsageDisk>(serverAddress, 9300, JsonConvert.SerializeObject(new UsageDisk(InformationGathererDisk.TotalFreeSpace(),InformationGathererBIOS.GetBiosSerialNumber())));
 
-                    //////////////////////////////////////////////// !!!КОСТЫЛЬ!!! ////////////////////////////////////
+
                     ServerMessageSender.SendMessageWindow(serverAddress, 9090,  OSInformationGatherer.GetWindows());//
-                    //////////////////////////////////////////////// !!!КОСТЫЛЬ!!! //////////////////////////////////
-                }
+                  
+               // }
 
             }
             catch (Exception ex)
