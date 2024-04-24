@@ -18,6 +18,10 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using Data_collection.Connection;
 using System.Net;
+using System.Net.Sockets;
+using System.Net;
+using System.Text;
+
 
 namespace Data_collection
 {
@@ -54,7 +58,7 @@ namespace Data_collection
             {
                 using NetworkStream stream = tcpClient.GetStream();
 
-                byte[] data = new byte[50];
+                byte[] data = new byte[5000];
                 int bytesRead;
 
                 // Читаем данные из потока
@@ -62,14 +66,37 @@ namespace Data_collection
                 {
                     string message = Encoding.UTF8.GetString(data, 0, bytesRead);
 
-                    byte[] response;
-                    if (message == "Привет!")
+                    byte[] response = response = Encoding.UTF8.GetBytes("Неверная команда");
+                    string clientIP = ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString();
+
+                    switch (message)
                     {
-                        response = Encoding.UTF8.GetBytes("Покаы");
-                    }
-                    else
-                    {
-                        response = Encoding.UTF8.GetBytes("Неверная команда");
+                        case "getTemperatureCPU":
+                            response = Encoding.UTF8.GetBytes(InformationGathererCPU.GetProcessorTemperature().ToString());
+                            break;
+                        case "getUsageCPU":
+                            response = Encoding.UTF8.GetBytes(InformationGathererCPU.GetCpuUsage().ToString());
+                            break;                                     
+                        case "getSpeedEthernet":
+                            response = Encoding.UTF8.GetBytes(NetworkInformationGatherer.EthernetSpeed().ToString());
+                            break;
+                        case "getTraffic [Network Interfase Name]":
+                            Sniffer.StartSend("Intel(R) Wi-Fi 6 AX201 160MHz", clientIP, 2222);
+                            break;
+                        case "getNetworkInterfases":
+                            var NetworkInterfase = NetworkInformationGatherer.GetNetworkInterfaces();
+                            string json = JsonConvert.SerializeObject(NetworkInterfase);
+                            response = Encoding.UTF8.GetBytes(json);
+                            break;
+                        case "getProcess":
+                            break;
+                        case "closeProcess [Name]":
+                            break;
+                        case "getKeye":
+                            break;
+                        case "getUsageRAM":
+
+                            break;
                     }
 
                    
@@ -87,59 +114,37 @@ namespace Data_collection
                 tcpClient.Close();
             }
         }
-        public static void SendMessage(string serverAddress, int port, string message)
+        public static async Task ReceiveBroadcastMessages(string address, int port)
         {
-            try
+            
+            using var udpClient = new UdpClient(port);
+            var brodcastAddress = IPAddress.Parse(address); 
+            udpClient.JoinMulticastGroup(brodcastAddress);
+            Console.WriteLine("Начало прослушивания сообщений");
+            while (true)
             {
-                // Создаем TcpClient и подключаемся к серверу
-                using TcpClient client = new TcpClient(serverAddress, port);
-                Console.WriteLine($"Подключено к серверу на порту {port}...");
-
-                // Получаем поток для обмена данными с сервером
-                using NetworkStream stream = client.GetStream();
-
-                // Отправляем сообщение серверу
-                byte[] data = Encoding.UTF8.GetBytes(message);
-                stream.Write(data, 0, data.Length);
-                Console.WriteLine($"Отправлено сообщение: {message}");
-
-                // Читаем ответ от сервера
-                data = new byte[256];
-                int bytesRead = stream.Read(data, 0, data.Length);
-                string response = Encoding.UTF8.GetString(data, 0, bytesRead);
-                Console.WriteLine($"Ответ от сервера: {response}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-        public static void ReceiveBroadcastMessages()
-        {
-            UdpClient udpClient = new UdpClient(11000);
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 11000);
-
-            try
-            {
-                while (true)
+                var result = await udpClient.ReceiveAsync();
+                string message = Encoding.UTF8.GetString(result.Buffer);
+                if (message == "END") break;
+                switch(message)
                 {
-                    byte[] buffer = udpClient.Receive(ref endPoint);
-                    string message = Encoding.UTF8.GetString(buffer);
-                    Console.WriteLine($"Received broadcast message: {message}");
-                    if (message == "getAll")
-                    {
-                        SendMessage(endPoint.Address.ToString(), 2222, InformationGathererUser.GetUserName());
-                    }
+                    case "getAll":
+                        ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 2222, $"Текущий пользователь: {InformationGathererUser.GetUserName().ToString()}\n" +
+                            $"Свободное место на диске: {InformationGathererDisk.TotalSpace().ToString()}\n" +
+                            $"IP Адрес {NetworkInformationGatherer.GetIPAddress().ToString()}\n" +
+                            $"MAC Адрес {NetworkInformationGatherer.GetMacAddress().ToString()}\n" +
+                            $"Процессор {InformationGathererCPU.GetProcessorName().ToString()}\n" +
+                            $"Количество ядер в процессоре {InformationGathererCPU.GetProcessorCoreCount().ToString()}\n" +
+                            $"Архитектура процессора {InformationGathererCPU.GetProcessorArchitecture().ToString()}\n" +
+                            $"Операционная система {OSInformationGatherer.GetOperatingSystemVersion().ToString()}\n"+
+                            $"Видеокарта {InformationGathererVideoCard.GetModel().ToString()}\n" +
+                            $"Серийный номер {InformationGathererBIOS.GetBiosSerialNumber()}\n");
+                        break;
                 }
+                Console.WriteLine(message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                udpClient.Close();
-            }
+            // отсоединяемся от группы
+            udpClient.DropMulticastGroup(brodcastAddress);
         }
 
         static void Main(string[] args)
@@ -147,10 +152,10 @@ namespace Data_collection
             //StartupManager.HideConsoleWindow();
             //StartupManager.CreateBatStartup();
 
-            IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+            IPAddress localAddr = IPAddress.Parse("192.168.221.240");
 
             Task.Run(() => StartServer(1111, HendleClient, localAddr));
-            ReceiveBroadcastMessages();
+            ReceiveBroadcastMessages("224.0.0.252",11000);
             Console.ReadKey();
 
             try

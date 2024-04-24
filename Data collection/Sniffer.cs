@@ -11,90 +11,125 @@ using PcapDotNet.Packets;
 using PcapDotNet.Packets.IpV4;
 using PcapDotNet.Packets.IpV6;
 using PcapDotNet.Packets.Transport;
-namespace Data_collection
+using Data_collection;
+namespace Data_collection.Connection;
+
+static public class Sniffer
 {
-    static public class Sniffer
+    public class DeviceInfo
     {
-        public class DeviceInfo
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string MacAddress { get; set; }
+    }
+    private static IList<LivePacketDevice> devices;
+    private static Regex name = new Regex("'(.*?)'");
+    public static List<string> GetNameNetworkInterfase()
+    {
+        var matchedNames = new List<string>();
+        foreach (var device in devices)
         {
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public string MacAddress { get; set; }
-        }
-        private static IList<LivePacketDevice> devices;
-        private static Regex name = new Regex("'(.*?)'");
-        public static List<string> GetNameNetworkInterfase()
-        {
-            var matchedNames = new List<string>();
-            foreach (var device in devices)
+            Match match = name.Match(device.Description);
+            if (match.Success)
             {
-                Match match = name.Match(device.Description);
-                if (match.Success)
-                {
-                    matchedNames.Add(match.Groups[1].Value);
-                }
+                matchedNames.Add(match.Groups[1].Value);
             }
-            return matchedNames;
         }
-        public static List<DeviceInfo> DevicesInfo()
+        return matchedNames;
+    }
+    public static List<DeviceInfo> DevicesInfo()
+    {
+        var deviceInfoList = new List<DeviceInfo>();
+        try
         {
-            var deviceInfoList = new List<DeviceInfo>();
-            try
+            foreach (LivePacketDevice i in devices)
             {
-                foreach (LivePacketDevice i in devices)
+                DeviceInfo deviceInfo = new()
                 {
-                    DeviceInfo deviceInfo = new()
-                    {
-                        Name = i.Name,
-                        Description = i.Description,
-                        MacAddress = i.GetMacAddress().ToString()
-                    };
-                    deviceInfoList.Add(deviceInfo);
-                }
-                return deviceInfoList;
+                    Name = i.Name,
+                    Description = i.Description,
+                    MacAddress = i.GetMacAddress().ToString()
+                };
+                deviceInfoList.Add(deviceInfo);
             }
-            catch { return deviceInfoList; }
+            return deviceInfoList;
         }
+        catch { return deviceInfoList; }
+    }
 
 
-        static Sniffer()
+    static Sniffer()
+    {
+        devices = LivePacketDevice.AllLocalMachine;
+        if (devices.Count == 0)
         {
-            devices = LivePacketDevice.AllLocalMachine;
-            if (devices.Count == 0)
+            throw new Exception("Устройства не найдены! Убедитесь, что вы работаете от имени администратора.");
+        }
+    }
+    static void PrintPacketDetails(Packet packet)
+    {
+        IpV4Datagram ip = packet.Ethernet.IpV4;
+        UdpDatagram udp = ip.Udp;
+
+        if (udp != null && udp.DestinationPort == 53)
+        {
+            var dns = udp.Dns;
+
+            foreach (var query in dns.Queries)
             {
-                throw new Exception("Устройства не найдены! Убедитесь, что вы работаете от имени администратора.");
+                Console.WriteLine($"Domain: {query.DomainName} | Time: {packet.Timestamp}");
+               
             }
         }
-        static void PrintPacketDetails(Packet packet)
+    }
+    public static void SendPacketDetails(Packet packet, string serverAddress, int port)
+    {
+        IpV4Datagram ip = packet.Ethernet.IpV4;
+        UdpDatagram udp = ip.Udp;
+
+        if (udp != null && udp.DestinationPort == 53)
         {
-            IpV4Datagram ip = packet.Ethernet.IpV4;
-            UdpDatagram udp = ip.Udp;
+            var dns = udp.Dns;
 
-            if (udp != null && udp.DestinationPort == 53)
+            foreach (var query in dns.Queries)
             {
-                var dns = udp.Dns;
-
-                foreach (var query in dns.Queries)
-                {
-                    Console.WriteLine($"Domain: {query.DomainName} | Time: {packet.Timestamp}");
-                }
+                string message = $"Domain: {query.DomainName} | Time: {packet.Timestamp}";
+                ServerMessageSender.SendMessage(serverAddress, port, message);
             }
         }
-        public static void Start(string deviceName)
+    }
+
+    public static void StartSend(string deviceName, string serverAddress, int port)
+    {
+        var device = devices.FirstOrDefault(d => name.Match(d.Description).Groups[1].Value == deviceName);
+        if (device != null)
         {
-            var device = devices.FirstOrDefault(d => name.Match(d.Description).Groups[1].Value == deviceName);
-            if (device != null)
+            using (var communicator = device.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
             {
-                using (var communicator = device.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
-                {
-                    // Захватываем пакеты
-                    communicator.ReceivePackets(0, PrintPacketDetails);
-                }
+                // Захватываем пакеты
+                communicator.ReceivePackets(0, packet => SendPacketDetails(packet, serverAddress, port));
             }
-            else
+        }
+        else
+        {
+            throw new Exception("Устройство не найдено");
+        }
+    }
+
+    public static void Start(string deviceName)
+    {
+        var device = devices.FirstOrDefault(d => name.Match(d.Description).Groups[1].Value == deviceName);
+        if (device != null)
+        {
+            using (var communicator = device.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
             {
-                throw new Exception("Устройство не найдено");
+                // Захватываем пакеты
+                communicator.ReceivePackets(0, PrintPacketDetails);
             }
+        }
+        else
+        {
+            throw new Exception("Устройство не найдено");
         }
     }
 }

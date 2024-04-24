@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Data_collection.Connection
 {
-    internal static class ServerMessageSender
+    public static class ServerMessageSender
     {
         public static void SendMessageWindow(string serverAddress, int port, List<WindowData> message)/////////////////////////////////////////Переделать
         {
@@ -134,7 +134,7 @@ namespace Data_collection.Connection
                 Console.WriteLine($"Отправлено сообщение: {message}");
 
                 // Читаем ответ от сервера
-                data = new byte[256];
+                data = new byte[5000];
                 int bytesRead = stream.Read(data, 0, data.Length);
                 string response = Encoding.UTF8.GetString(data, 0, bytesRead);
                 Console.WriteLine($"Ответ от сервера: {response}");
