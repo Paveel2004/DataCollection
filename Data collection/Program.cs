@@ -52,13 +52,66 @@ namespace Data_collection
                 server?.Stop();
             }
         }
+        static List<string> GetInstalledApps()
+        {
+            string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            List<string> installedApps = new List<string>();
+
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registry_key))
+            {
+                foreach (string subkey_name in key.GetSubKeyNames())
+                {
+                    using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                    {
+                        if (subkey.GetValue("DisplayName") != null)
+                        {
+                            installedApps.Add(subkey.GetValue("DisplayName").ToString());
+                        }
+                    }
+                }
+            }
+
+            return installedApps;
+        }
+
+        public static List<string> GetProcessInfo()
+        {
+            List<string> processInfoWithTitle = new List<string>();
+            List<string> processInfoWithoutTitle = new List<string>();
+
+            // Получаем все процессы
+            Process[] processlist = Process.GetProcesses();
+
+            // Выводим информацию о каждом процессе
+            foreach (Process theprocess in processlist)
+            {
+                string title = theprocess.MainWindowTitle != "" ? theprocess.MainWindowTitle : "—";
+                string processDetails = $"Process:{theprocess.ProcessName}\nTitle:{title}\nMemory:{theprocess.WorkingSet64} B\n";
+
+                if (theprocess.MainWindowTitle != "")
+                {
+                    processInfoWithTitle.Add(processDetails);
+                }
+                else
+                {
+                    processInfoWithoutTitle.Add(processDetails);
+                }
+            }
+
+            // Сначала добавляем процессы с названиями, а затем все остальные
+            processInfoWithTitle.AddRange(processInfoWithoutTitle);
+
+            return processInfoWithTitle;
+        }
+
+
         static void HendleClient(TcpClient tcpClient)
         {
             try
             {
                 using NetworkStream stream = tcpClient.GetStream();
 
-                byte[] data = new byte[5000];
+                byte[] data = new byte[999999];
                 int bytesRead;
 
                 // Читаем данные из потока
@@ -88,15 +141,19 @@ namespace Data_collection
                             string json = JsonConvert.SerializeObject(NetworkInterfase);
                             response = Encoding.UTF8.GetBytes(json);
                             break;
-                        case "getProcess":
+                        case "getProcesses":
+                            response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(GetProcessInfo()));
                             break;
                         case "closeProcess [Name]":
                             break;
                         case "getKeye":
                             break;
                         case "getUsageRAM":
-
                             break;
+                        case "getApplications":
+                            response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(GetInstalledApps()));
+                            break;
+
                     }
 
                    
@@ -129,16 +186,19 @@ namespace Data_collection
                 switch(message)
                 {
                     case "getAll":
-                        ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 2222, $"Текущий пользователь: {InformationGathererUser.GetUserName().ToString()}\n" +
-                            $"Свободное место на диске: {InformationGathererDisk.TotalSpace().ToString()}\n" +
-                            $"IP Адрес {NetworkInformationGatherer.GetIPAddress().ToString()}\n" +
-                            $"MAC Адрес {NetworkInformationGatherer.GetMacAddress().ToString()}\n" +
-                            $"Процессор {InformationGathererCPU.GetProcessorName().ToString()}\n" +
-                            $"Количество ядер в процессоре {InformationGathererCPU.GetProcessorCoreCount().ToString()}\n" +
-                            $"Архитектура процессора {InformationGathererCPU.GetProcessorArchitecture().ToString()}\n" +
-                            $"Операционная система {OSInformationGatherer.GetOperatingSystemVersion().ToString()}\n"+
-                            $"Видеокарта {InformationGathererVideoCard.GetModel().ToString()}\n" +
-                            $"Серийный номер {InformationGathererBIOS.GetBiosSerialNumber()}\n");
+                        ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 2222,
+                            $"IP Адрес: {NetworkInformationGatherer.GetIPAddress().ToString()}\n" +
+                            $"MAC Адрес: {NetworkInformationGatherer.GetMacAddress().ToString()}\n" +
+                            $"Процессор: {InformationGathererCPU.GetProcessorName().ToString()}\n" +
+                            $"Количество ядер в процессоре: {InformationGathererCPU.GetProcessorCoreCount().ToString()}\n" +
+                            $"Архитектура процессора: {InformationGathererCPU.GetProcessorArchitecture().ToString()}\n" +
+                            $"Имя компьютера: {OSInformationGatherer.GetComputerName().ToString()}\n" +
+                            $"Операционная система: {OSInformationGatherer.GetOperatingSystem().ToString()}\n" +
+                            $"Текущий пользователь: {InformationGathererUser.GetUserName().ToString()}\n" +
+                            $"Оперативная память: {InformationGathererRAM.GetTotalPhysicalMemory().ToString()}\n" +
+                            $"Объём диска: {InformationGathererDisk.TotalSpace().ToString()}\n" +
+                            $"Видеокарта: {InformationGathererVideoCard.GetModel().ToString()}\n");
+                            
                         break;
                 }
                 Console.WriteLine(message);
@@ -152,7 +212,7 @@ namespace Data_collection
             //StartupManager.HideConsoleWindow();
             //StartupManager.CreateBatStartup();
 
-            IPAddress localAddr = IPAddress.Parse("192.168.221.240");
+            IPAddress localAddr = IPAddress.Parse("192.168.1.52");
 
             Task.Run(() => StartServer(1111, HendleClient, localAddr));
             ReceiveBroadcastMessages("224.0.0.252",11000);
