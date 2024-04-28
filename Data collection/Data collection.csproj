@@ -20,4 +20,12 @@
     <ProjectReference Include="..\..\ClientS6\Class\GlobalClass.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\ASUS\source\repos\Data collection\Data collection\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\ASUS\source\repos\Data collection\Data collection\.editorconfig" />
+  </ItemGroup>
+
 </Project>

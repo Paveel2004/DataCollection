@@ -104,7 +104,10 @@ namespace Data_collection
             return processInfoWithTitle;
         }
 
-
+        static TimeSpan GetSystemUpTime()
+        {
+            return TimeSpan.FromMilliseconds(Environment.TickCount64);
+        }
         static void HendleClient(TcpClient tcpClient)
         {
             try
@@ -153,12 +156,17 @@ namespace Data_collection
                         case "getApplications":
                             response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(GetInstalledApps()));
                             break;
-
-                    }
-
-                   
+                        case "AdditionalInformation":
+                            var runtime = GetSystemUpTime();
+                            response = Encoding.UTF8.GetBytes(
+                                $"Загруженность ОЗУ: {InformationGathererRAM.GetUsageRam()} %\n" +
+                                $"Состояние ОС: {OSInformationGatherer.GetSystemState()}\n" +
+                                $"Версия ОС: {OSInformationGatherer.GetOperatingSystemVersion()} \n" +
+                                $"Свободное место: {InformationGathererDisk.TotalFreeSpace()} \n" +
+                                $"Время работы {runtime.ToString(@"hh\:mm\:ss")}");
+                            break;
+                    }                   
                     stream.Write(response, 0, response.Length);
-
                 }
             }
             catch (Exception ex)
