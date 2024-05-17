@@ -21,6 +21,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
+using Data_collection.Control;
 
 
 namespace Data_collection
@@ -121,18 +123,29 @@ namespace Data_collection
                 while ((bytesRead = stream.Read(data, 0, data.Length)) != 0)
                 {
                     string message = Encoding.UTF8.GetString(data, 0, bytesRead);
-
+                    string json = null;
                     byte[] response = response = Encoding.UTF8.GetBytes("Неверная команда");
                     string clientIP = ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString();
+                    string site = null;
+                    string sitePattern = @"blockSite \[(.*?)\]";
+                    Match match = Regex.Match(message, sitePattern);
+                    if (match.Success)
+                    {
+                        site = match.Groups[1].Value;
+                        message = "blockSite";
+                    }
 
                     switch (message)
                     {
+                        case "blockSite":
+                            WebControl.BlockedWebsite(new StringBuilder(site));
+                            break;
                         case "getTemperatureCPU":
                             response = Encoding.UTF8.GetBytes(InformationGathererCPU.GetProcessorTemperature().ToString());
                             break;
                         case "getUsageCPU":
                             response = Encoding.UTF8.GetBytes(InformationGathererCPU.GetCpuUsage().ToString());
-                            break;                                     
+                            break;
                         case "getSpeedEthernet":
                             response = Encoding.UTF8.GetBytes(NetworkInformationGatherer.EthernetSpeed().ToString());
                             break;
@@ -141,7 +154,7 @@ namespace Data_collection
                             break;
                         case "getNetworkInterfases":
                             var NetworkInterfase = NetworkInformationGatherer.GetNetworkInterfaces();
-                            string json = JsonConvert.SerializeObject(NetworkInterfase);
+                            json = JsonConvert.SerializeObject(NetworkInterfase);
                             response = Encoding.UTF8.GetBytes(json);
                             break;
                         case "getProcesses":
@@ -158,14 +171,19 @@ namespace Data_collection
                             break;
                         case "AdditionalInformation":
                             var runtime = GetSystemUpTime();
-                            response = Encoding.UTF8.GetBytes(
-                                $"Загруженность ОЗУ: {InformationGathererRAM.GetUsageRam()} %\n" +
-                                $"Состояние ОС: {OSInformationGatherer.GetSystemState()}\n" +
-                                $"Версия ОС: {OSInformationGatherer.GetOperatingSystemVersion()} \n" +
-                                $"Свободное место: {InformationGathererDisk.TotalFreeSpace()} \n" +
-                                $"Время работы {runtime.ToString(@"hh\:mm\:ss")}");
+                            var Info = new Dictionary<string, string>
+{
+    {"Загруженность ОЗУ", InformationGathererRAM.GetUsageRam() + " %"},
+    {"Состояние ОС", OSInformationGatherer.GetSystemState().ToString()},
+    {"Версия ОС", OSInformationGatherer.GetOperatingSystemVersion().ToString()},
+    {"Свободное место", InformationGathererDisk.TotalFreeSpace().ToString()},
+    {"Время работы", runtime.ToString(@"hh\:mm\:ss")}
+
+};
+                            json = JsonConvert.SerializeObject(Info, Formatting.Indented);
+                            response = Encoding.UTF8.GetBytes(json);
                             break;
-                    }                   
+                    }
                     stream.Write(response, 0, response.Length);
                 }
             }
@@ -181,9 +199,9 @@ namespace Data_collection
         }
         public static async Task ReceiveBroadcastMessages(string address, int port)
         {
-            
+
             using var udpClient = new UdpClient(port);
-            var brodcastAddress = IPAddress.Parse(address); 
+            var brodcastAddress = IPAddress.Parse(address);
             udpClient.JoinMulticastGroup(brodcastAddress);
             Console.WriteLine("Начало прослушивания сообщений");
             while (true)
@@ -191,22 +209,28 @@ namespace Data_collection
                 var result = await udpClient.ReceiveAsync();
                 string message = Encoding.UTF8.GetString(result.Buffer);
                 if (message == "END") break;
-                switch(message)
+                switch (message)
                 {
                     case "getAll":
-                        ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 2222,
-                            $"IP Адрес: {NetworkInformationGatherer.GetIPAddress().ToString()}\n" +
-                            $"MAC Адрес: {NetworkInformationGatherer.GetMacAddress().ToString()}\n" +
-                            $"Процессор: {InformationGathererCPU.GetProcessorName().ToString()}\n" +
-                            $"Количество ядер в процессоре: {InformationGathererCPU.GetProcessorCoreCount().ToString()}\n" +
-                            $"Архитектура процессора: {InformationGathererCPU.GetProcessorArchitecture().ToString()}\n" +
-                            $"Имя компьютера: {OSInformationGatherer.GetComputerName().ToString()}\n" +
-                            $"Операционная система: {OSInformationGatherer.GetOperatingSystem().ToString()}\n" +
-                            $"Текущий пользователь: {InformationGathererUser.GetUserName().ToString()}\n" +
-                            $"Оперативная память: {InformationGathererRAM.GetTotalPhysicalMemory().ToString()}\n" +
-                            $"Объём диска: {InformationGathererDisk.TotalSpace().ToString()}\n" +
-                            $"Видеокарта: {InformationGathererVideoCard.GetModel().ToString()}\n");
-                            
+                        var data = new Dictionary<string, string>
+                        {
+                                {"IP Адрес", NetworkInformationGatherer.GetIPAddress().ToString()},
+                               {"MAC Адрес", NetworkInformationGatherer.GetMacAddress().ToString()},
+                               {"Процессор", InformationGathererCPU.GetProcessorName().ToString()},
+                               {"Количество ядер в процессоре", InformationGathererCPU.GetProcessorCoreCount().ToString()},
+                               {"Архитектура процессора", InformationGathererCPU.GetProcessorArchitecture().ToString()},
+                               {"Имя компьютера", OSInformationGatherer.GetComputerName().ToString()},
+                               {"Операционная система", OSInformationGatherer.GetOperatingSystem().ToString()},
+                               {"Текущий пользователь", InformationGathererUser.GetUserName().ToString()},
+                               {"Оперативная память", InformationGathererRAM.GetTotalPhysicalMemory().ToString()},
+                               {"Объём диска", InformationGathererDisk.TotalSpace().ToString()},
+                               {"Видеокарта", InformationGathererVideoCard.GetModel().ToString()}
+                        };
+
+                        string json = JsonConvert.SerializeObject(data, Formatting.Indented);
+
+                        ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 2222, json);
+
                         break;
                 }
                 Console.WriteLine(message);
@@ -223,7 +247,7 @@ namespace Data_collection
             IPAddress localAddr = IPAddress.Parse("192.168.1.52");
 
             Task.Run(() => StartServer(1111, HendleClient, localAddr));
-            ReceiveBroadcastMessages("224.0.0.252",11000);
+            ReceiveBroadcastMessages("224.0.0.252", 11000);
             Console.ReadKey();
 
             try
@@ -234,30 +258,30 @@ namespace Data_collection
                 //  dynamic data = JsonConvert.DeserializeObject(jsonContent);
 
                 // var obj = JObject.Parse(jsonContent);
-/*                string serverAddress = "127.0.0.1";//(string)obj["serverAddress"];
+                /*                string serverAddress = "127.0.0.1";//(string)obj["serverAddress"];
 
-                DeviceData<NetworkInterfaceData> DataNetwork = new() { Data = NetworkInformationGatherer.GetNetworkInterfaces(), SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber() };
-                DeviceData<CPUData> DataCPU = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererCPU.GetCPU() };
-                DeviceData<RAMData> DataRAM = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererRAM.GetRAM() };
-                DeviceData<VideoСardData> DataVideoCard = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererVideoCard.GetModels() };
-
-
-                Console.WriteLine(JsonHelper.SerializeDeviceData(new DeviceData<WindowData> { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = OSInformationGatherer.GetWindows() }));
+                                DeviceData<NetworkInterfaceData> DataNetwork = new() { Data = NetworkInformationGatherer.GetNetworkInterfaces(), SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber() };
+                                DeviceData<CPUData> DataCPU = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererCPU.GetCPU() };
+                                DeviceData<RAMData> DataRAM = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererRAM.GetRAM() };
+                                DeviceData<VideoСardData> DataVideoCard = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererVideoCard.GetModels() };
 
 
-                ServerMessageSender.SendMessage(serverAddress, 9440, JsonConvert.SerializeObject(new DeviceInitialization(InformationGathererBIOS.GetBiosSerialNumber(), OSInformationGatherer.GetComputerName())));
-                ServerMessageSender.SendMessage(serverAddress, 9930, JsonHelper.SerializeDeviceData(DataNetwork));
-                ServerMessageSender.SendMessage(serverAddress, 9860, JsonHelper.SerializeDeviceData(DataCPU));
-                ServerMessageSender.SendMessage(serverAddress, 9790, JsonHelper.SerializeDeviceData(DataRAM));
-                ServerMessageSender.SendMessage(serverAddress, 9370, JsonHelper.SerializeDeviceData(DataVideoCard));
-                ServerMessageSender.SendMessage(serverAddress, 9230, JsonConvert.SerializeObject(new DiskData(InformationGathererDisk.TotalSpace(), InformationGathererBIOS.GetBiosSerialNumber())));
-                ServerMessageSender.SendMessage(serverAddress, 9160, JsonConvert.SerializeObject(new OSData(OSInformationGatherer.GetOperatingSystem(), InformationGathererBIOS.GetBiosSerialNumber())));
-                ServerMessageSender.SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(), InformationGathererBIOS.GetBiosSerialNumber())));
-                ServerMessageSender.SendMessageUsage<UsageOS>(serverAddress, 9650, JsonConvert.SerializeObject(new UsageOS(InformationGathererUser.GetUserName(), OSInformationGatherer.GetSystemState(), InformationGathererBIOS.GetBiosSerialNumber())));
-                ServerMessageSender.SendMessageUsage<UsageCPU>(serverAddress, 9580, JsonConvert.SerializeObject(new UsageCPU(InformationGathererCPU.GetProcessorTemperature(), InformationGathererCPU.GetCpuUsage(), InformationGathererBIOS.GetBiosSerialNumber())));
-                ServerMessageSender.SendMessageUsage<UsageEthernet>(serverAddress, 9510, JsonConvert.SerializeObject(new UsageEthernet(NetworkInformationGatherer.EthernetSpeed(), InformationGathererBIOS.GetBiosSerialNumber())));
-                ServerMessageSender.SendMessageUsage<UsageDisk>(serverAddress, 9300, JsonConvert.SerializeObject(new UsageDisk(InformationGathererDisk.TotalFreeSpace(), InformationGathererBIOS.GetBiosSerialNumber())));
-                ServerMessageSender.SendMessageWindow(serverAddress, 9090, OSInformationGatherer.GetWindows());*/
+                                Console.WriteLine(JsonHelper.SerializeDeviceData(new DeviceData<WindowData> { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = OSInformationGatherer.GetWindows() }));
+
+
+                                ServerMessageSender.SendMessage(serverAddress, 9440, JsonConvert.SerializeObject(new DeviceInitialization(InformationGathererBIOS.GetBiosSerialNumber(), OSInformationGatherer.GetComputerName())));
+                                ServerMessageSender.SendMessage(serverAddress, 9930, JsonHelper.SerializeDeviceData(DataNetwork));
+                                ServerMessageSender.SendMessage(serverAddress, 9860, JsonHelper.SerializeDeviceData(DataCPU));
+                                ServerMessageSender.SendMessage(serverAddress, 9790, JsonHelper.SerializeDeviceData(DataRAM));
+                                ServerMessageSender.SendMessage(serverAddress, 9370, JsonHelper.SerializeDeviceData(DataVideoCard));
+                                ServerMessageSender.SendMessage(serverAddress, 9230, JsonConvert.SerializeObject(new DiskData(InformationGathererDisk.TotalSpace(), InformationGathererBIOS.GetBiosSerialNumber())));
+                                ServerMessageSender.SendMessage(serverAddress, 9160, JsonConvert.SerializeObject(new OSData(OSInformationGatherer.GetOperatingSystem(), InformationGathererBIOS.GetBiosSerialNumber())));
+                                ServerMessageSender.SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(), InformationGathererBIOS.GetBiosSerialNumber())));
+                                ServerMessageSender.SendMessageUsage<UsageOS>(serverAddress, 9650, JsonConvert.SerializeObject(new UsageOS(InformationGathererUser.GetUserName(), OSInformationGatherer.GetSystemState(), InformationGathererBIOS.GetBiosSerialNumber())));
+                                ServerMessageSender.SendMessageUsage<UsageCPU>(serverAddress, 9580, JsonConvert.SerializeObject(new UsageCPU(InformationGathererCPU.GetProcessorTemperature(), InformationGathererCPU.GetCpuUsage(), InformationGathererBIOS.GetBiosSerialNumber())));
+                                ServerMessageSender.SendMessageUsage<UsageEthernet>(serverAddress, 9510, JsonConvert.SerializeObject(new UsageEthernet(NetworkInformationGatherer.EthernetSpeed(), InformationGathererBIOS.GetBiosSerialNumber())));
+                                ServerMessageSender.SendMessageUsage<UsageDisk>(serverAddress, 9300, JsonConvert.SerializeObject(new UsageDisk(InformationGathererDisk.TotalFreeSpace(), InformationGathererBIOS.GetBiosSerialNumber())));
+                                ServerMessageSender.SendMessageWindow(serverAddress, 9090, OSInformationGatherer.GetWindows());*/
 
             }
             catch (Exception ex)
