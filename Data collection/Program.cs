@@ -89,7 +89,7 @@ namespace Data_collection
             foreach (Process theprocess in processlist)
             {
                 string title = theprocess.MainWindowTitle != "" ? theprocess.MainWindowTitle : "—";
-                string processDetails = $"Process:{theprocess.ProcessName}\nTitle:{title}\nMemory:{theprocess.WorkingSet64} B\n";
+                string processDetails = $"Процесс: {theprocess.ProcessName}\nНазвание окна: {title}\nОперативная память: {theprocess.WorkingSet64 / Math.Pow(1024, 2)} МB\n";
 
                 if (theprocess.MainWindowTitle != "")
                 {
@@ -192,7 +192,6 @@ namespace Data_collection
     {"Версия ОС", OSInformationGatherer.GetOperatingSystemVersion().ToString()},
     {"Свободное место", InformationGathererDisk.TotalFreeSpace().ToString()},
     {"Время работы", runtime.ToString(@"hh\:mm\:ss")}
-
 };
                             json = JsonConvert.SerializeObject(Info, Formatting.Indented);
                             response = Encoding.UTF8.GetBytes(json);
