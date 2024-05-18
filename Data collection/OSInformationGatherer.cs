@@ -118,6 +118,26 @@ namespace Data_collection
 
             return "N/A";
         }
+        public static string[] GetActiveUserNames()
+        {
+            // Создайте объект запроса WMI
+            SelectQuery query = new SelectQuery("SELECT * FROM Win32_UserAccount WHERE Disabled = FALSE");
+
+            // Инициализируйте поставщик управления с помощью запроса
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+
+            List<string> userNames = new List<string>();
+
+            // Переберите все объекты и добавьте имена пользователей в список
+            foreach (ManagementObject user in searcher.Get())
+            {
+                userNames.Add(user["Name"].ToString());
+            }
+
+            // Верните массив имен пользователей
+            return userNames.ToArray();
+        }
+
         public static int GetNumberOfUsers()
         {
             string query = "SELECT NumberOfUsers FROM Win32_OperatingSystem";

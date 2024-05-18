@@ -23,6 +23,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using Data_collection.Control;
+using System.Text.Json;
 
 
 namespace Data_collection
@@ -127,18 +128,31 @@ namespace Data_collection
                     byte[] response = response = Encoding.UTF8.GetBytes("Неверная команда");
                     string clientIP = ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString();
                     string site = null;
-                    string sitePattern = @"blockSite \[(.*?)\]";
-                    Match match = Regex.Match(message, sitePattern);
-                    if (match.Success)
+                    string siteBlockPattern = @"blockSite \[(.*?)\]";
+                    string siteUnBlockPattern = @"unBlockSite \[(.*?)\]";
+                    Match matchBlock = Regex.Match(message, siteBlockPattern);
+                    Match matchUnBlock = Regex.Match(message, siteUnBlockPattern);
+                    if (matchBlock.Success)
                     {
-                        site = match.Groups[1].Value;
+                        site = matchBlock.Groups[1].Value;
                         message = "blockSite";
+                    }
+                    if (matchUnBlock.Success)
+                    {
+                        site = matchUnBlock.Groups[1].Value;
+                        message = "unBlockSite";
                     }
 
                     switch (message)
                     {
+                        case "getUsers":
+                            response = Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize<string[]>(OSInformationGatherer.GetActiveUserNames()));
+                            break;
                         case "blockSite":
                             WebControl.BlockedWebsite(new StringBuilder(site));
+                            break;
+                        case "unBlockSite":
+                            WebControl.UnBlockedWebSite(site);
                             break;
                         case "getTemperatureCPU":
                             response = Encoding.UTF8.GetBytes(InformationGathererCPU.GetProcessorTemperature().ToString());
@@ -214,7 +228,7 @@ namespace Data_collection
                     case "getAll":
                         var data = new Dictionary<string, string>
                         {
-                                {"IP Адрес", NetworkInformationGatherer.GetIPAddress().ToString()},
+                               {"IP Адрес", NetworkInformationGatherer.GetIPAddress().ToString()},
                                {"MAC Адрес", NetworkInformationGatherer.GetMacAddress().ToString()},
                                {"Процессор", InformationGathererCPU.GetProcessorName().ToString()},
                                {"Количество ядер в процессоре", InformationGathererCPU.GetProcessorCoreCount().ToString()},
@@ -244,7 +258,7 @@ namespace Data_collection
             //StartupManager.HideConsoleWindow();
             //StartupManager.CreateBatStartup();
 
-            IPAddress localAddr = IPAddress.Parse("192.168.1.52");
+            IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());
 
             Task.Run(() => StartServer(1111, HendleClient, localAddr));
             ReceiveBroadcastMessages("224.0.0.252", 11000);
