@@ -24,6 +24,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Data_collection.Control;
 using System.Text.Json;
+using static Data_collection.InformationGathererProcess;
 
 
 namespace Data_collection
@@ -73,14 +74,12 @@ namespace Data_collection
                     }
                 }
             }
-
             return installedApps;
         }
 
-        public static List<string> GetProcessInfo()
+        public static List<ProcessInfo> GetProcessInfo()
         {
-            List<string> processInfoWithTitle = new List<string>();
-            List<string> processInfoWithoutTitle = new List<string>();
+            List<ProcessInfo> processInfoList = new List<ProcessInfo>();
 
             // Получаем все процессы
             Process[] processlist = Process.GetProcesses();
@@ -89,23 +88,15 @@ namespace Data_collection
             foreach (Process theprocess in processlist)
             {
                 string title = theprocess.MainWindowTitle != "" ? theprocess.MainWindowTitle : "—";
-                string processDetails = $"Процесс: {theprocess.ProcessName}\nНазвание окна: {title}\nОперативная память: {theprocess.WorkingSet64 / Math.Pow(1024, 2)} МB\n";
+                double memoryUsageMB = theprocess.WorkingSet64 / Math.Pow(1024, 2);
+                ProcessInfo processInfo = new ProcessInfo(theprocess.ProcessName, title, memoryUsageMB);
 
-                if (theprocess.MainWindowTitle != "")
-                {
-                    processInfoWithTitle.Add(processDetails);
-                }
-                else
-                {
-                    processInfoWithoutTitle.Add(processDetails);
-                }
+                processInfoList.Add(processInfo);
             }
 
-            // Сначала добавляем процессы с названиями, а затем все остальные
-            processInfoWithTitle.AddRange(processInfoWithoutTitle);
-
-            return processInfoWithTitle;
+            return processInfoList;
         }
+
 
         static TimeSpan GetSystemUpTime()
         {
