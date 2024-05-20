@@ -136,6 +136,15 @@ namespace Data_collection
 
                     switch (message)
                     {
+                        case "getUserName":
+                            response = Encoding.UTF8.GetBytes(InformationGathererUser.GetUserName().ToString());
+                            break;
+                        case "getComputerName":
+                            response = Encoding.UTF8.GetBytes(OSInformationGatherer.GetComputerName().ToString());
+                            break;                   
+                        case "getTotalRAM":
+                            response = Encoding.UTF8.GetBytes((double.Parse(InformationGathererRAM.GetTotalPhysicalMemory().ToString()) / (1024 * 1024)).ToString());
+                            break;
                         case "getUsers":
                             response = Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize<string[]>(OSInformationGatherer.GetActiveUserNames()));
                             break;
@@ -226,7 +235,7 @@ namespace Data_collection
                                {"Имя компьютера", OSInformationGatherer.GetComputerName().ToString()},
                                {"Операционная система", OSInformationGatherer.GetOperatingSystem().ToString()},
                                {"Текущий пользователь", InformationGathererUser.GetUserName().ToString()},
-                               {"Оперативная память", InformationGathererRAM.GetTotalPhysicalMemory().ToString()},
+                                {"Оперативная память", (double.Parse(InformationGathererRAM.GetTotalPhysicalMemory().ToString()) / (1024 * 1024)).ToString() + " МБ"},
                                {"Объём диска", InformationGathererDisk.TotalSpace().ToString()},
                                {"Видеокарта", InformationGathererVideoCard.GetModel().ToString()}
                         };
