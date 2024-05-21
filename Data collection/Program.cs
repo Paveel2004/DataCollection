@@ -210,6 +210,21 @@ namespace Data_collection
                 tcpClient.Close();
             }
         }
+        class ComputerData
+        {
+            public string ComputerName { get; set; }
+            public string ProcessorModel { get; set; }
+            public string ProcessorArchitecture { get; set; }
+            public string ProcessorCores { get; set; }
+            public string RAMSize { get; set; }
+            public string RAMFrequency { get; set; }
+            public string RAMType { get; set; }
+            public string GPUModel { get; set; }
+            public string OS { get; set; }
+            public string OSVersion { get; set; }
+            public string OSArchitecture { get; set; }
+            public string TotalSpaceDisk { get; set; }
+        }
         public static async Task ReceiveBroadcastMessages(string address, int port)
         {
 
@@ -244,6 +259,9 @@ namespace Data_collection
 
                         ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 2222, json);
 
+                        break;
+                    case "getBuild":
+                        
                         break;
                 }
                 Console.WriteLine(message);
