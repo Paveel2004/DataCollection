@@ -176,6 +176,35 @@ namespace Data_collection
             }
             return RAMs;
         }
+        public static double GetRAMSpeed()
+        {
+            List<double> ramSpeeds = new List<double>();
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_PhysicalMemory");
+
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                if (obj["Speed"] != null)
+                {
+                    double speed = Convert.ToDouble(obj["Speed"]);
+                    ramSpeeds.Add(speed);
+                }
+            }
+
+            if (ramSpeeds.Count > 0)
+            {
+                double totalSpeed = 0;
+                foreach (double speed in ramSpeeds)
+                {
+                    totalSpeed += speed;
+                }
+                return totalSpeed / ramSpeeds.Count;
+            }
+            else
+            {
+                return 0; // Возвращаем 0, если не удалось получить данные о скорости
+            }
+        }
+
 
     }
 }

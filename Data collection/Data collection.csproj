@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     <PackageReference Include="Pcap.Net.x64" Version="1.0.4.1" />
     <PackageReference Include="SpeedTest.NetCore" Version="2.1.0" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0" />

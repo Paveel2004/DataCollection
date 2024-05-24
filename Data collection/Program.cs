@@ -25,13 +25,26 @@ using System.Text.RegularExpressions;
 using Data_collection.Control;
 using System.Text.Json;
 using static Data_collection.InformationGathererProcess;
-
+using GlobalClass;
+using Newtonsoft.Json.Converters;
+using Server;
+using System.Runtime.Intrinsics.Arm;
+using System.Timers;
+using System.Threading;
+using System.CodeDom.Compiler;
+using Microsoft.VisualBasic;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Data_collection
 {
 
     internal class Program
     {
+        static string connectionString = "Server=192.168.1.143\\SQLEXPRESS; Database=S6Server; User Id=Name; Password=12345QWERTasdfg; TrustServerCertificate=true";
+
+
+        //static string connectionString = "Data Source = DESKTOP-LVEJL0B\\SQLEXPRESS;Initial Catalog=S6ClientDB;Integrated Security=true;TrustServerCertificate=True "; // Замените на свой строку подключения
         static async void StartServer(int port, Action<TcpClient> handleClient, IPAddress localAddr)
         {
             TcpListener server = null;
@@ -231,6 +244,7 @@ namespace Data_collection
             using var udpClient = new UdpClient(port);
             var brodcastAddress = IPAddress.Parse(address);
             udpClient.JoinMulticastGroup(brodcastAddress);
+            string json;
             Console.WriteLine("Начало прослушивания сообщений");
             while (true)
             {
@@ -255,13 +269,39 @@ namespace Data_collection
                                {"Видеокарта", InformationGathererVideoCard.GetModel().ToString()}
                         };
 
-                        string json = JsonConvert.SerializeObject(data, Formatting.Indented);
+                        json = JsonConvert.SerializeObject(data, Formatting.Indented);
 
                         ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 2222, json);
 
                         break;
                     case "getBuild":
+                        {
+                            DeviceCharacteristics sborka = new DeviceCharacteristics
+                            {
+                                ComputerName = OSInformationGatherer.GetComputerName(),
+                                ProcessorModel = InformationGathererCPU.GetProcessorName(),
+                                ProcessorArchitecture = InformationGathererCPU.GetProcessorArchitecture(),
+                                ProcessorCores = InformationGathererCPU.GetProcessorCoreCount().ToString(),
+                                RAMSize = (double.Parse(InformationGathererRAM.GetTotalPhysicalMemory().ToString()) / (1024 * 1024)).ToString(),
+                                RAMFrequency = InformationGathererRAM.GetRAMSpeed().ToString(),
+                                RAMType = InformationGathererRAM.GetTypeRAM().ToString(),
+                                GPUModel = InformationGathererVideoCard.GetModel(),
+                                OS = OSInformationGatherer.GetOperatingSystem(),
+                                OSVersion = OSInformationGatherer.GetOperatingSystemVersion(),
+                                OSArchitecture = OSInformationGatherer.GetSystemBitArchitecture().ToString(),
+                                TotalSpaceDisk = InformationGathererDisk.TotalSpace().ToString(),
+                                SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber().ToString(),
+                            };
+                            json = JsonConvert.SerializeObject(sborka, Formatting.Indented);
+                            ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 3333, json);
+
+                        }
+                        break;
+                    case "getApp":
+                        json = GetInstalledAppsWithBiosSerialNumberAsJson(InformationGathererBIOS.GetBiosSerialNumber());
+                        ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 4444, json);
                         
+
                         break;
                 }
                 Console.WriteLine(message);
@@ -269,56 +309,134 @@ namespace Data_collection
             // отсоединяемся от группы
             udpClient.DropMulticastGroup(brodcastAddress);
         }
+        public static double monitoringInterval = 60*1000*5;
+        static string GetInstalledAppsWithBiosSerialNumberAsJson(string biosSerialNumber)
+        {
+            List<AppInfo> appsList = new List<AppInfo>();
 
+            string registryKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registryKey))
+            {
+                foreach (string subkey_name in key.GetSubKeyNames())
+                {
+                    using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                    {
+                        string appName = subkey.GetValue("DisplayName") as string;
+
+                        string installDateValue = subkey.GetValue("InstallDate") as string;
+                        DateTime? installDate = null;
+                        if (!string.IsNullOrEmpty(installDateValue) && DateTime.TryParseExact(installDateValue, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+                        {
+                            installDate = parsedDate;
+                        }
+
+                        object sizeObj = subkey.GetValue("EstimatedSize");
+                        int? appSize = null;
+                        if (sizeObj != null)
+                        {
+                            appSize = Convert.ToInt32(sizeObj);
+                        }
+
+                        if (!string.IsNullOrEmpty(appName))
+                        {
+                            appsList.Add(new AppInfo { Name = appName, InstallDate = installDate, Size = appSize });
+                        }
+                    }
+                }
+            }
+
+            // Добавляем серийный номер биоса в самый верхний уровень JSON
+            Dictionary<string, object> jsonObject = new Dictionary<string, object>();
+            jsonObject.Add("BiosSerialNumber", biosSerialNumber);
+            jsonObject.Add("InstalledApps", appsList);
+
+            string json = JsonConvert.SerializeObject(jsonObject, Formatting.Indented);
+            return json;
+        }
+        public static void OSBoot()
+        {
+            string dateTimeString = DateTime.Now.ToString("s");
+            DataBaseHelper.Query($"EXECUTE ДобавитьИспользование @СерийныйНомерBIOS='{InformationGathererBIOS.GetBiosSerialNumber()}', @ТипХарактеристики = 'ОС', @Характеристика = 'Состояние', @Значение = '{OSInformationGatherer.GetSystemState()}', @ДатаВремя = '{dateTimeString}'");
+            DataBaseHelper.Query($"EXECUTE ДобавитьИспользование @СерийныйНомерBIOS='{InformationGathererBIOS.GetBiosSerialNumber()}', @ТипХарактеристики = 'ОС', @Характеристика = 'Текущий пользователь', @Значение = '{InformationGathererUser.GetUserName()}', @ДатаВремя = '{dateTimeString}'");
+        }
+        public static void PCBoot()
+        {
+            OSBoot();
+        }
+        
+
+        public static int GetLastIdFromUsage(string connectionString)
+        {
+            int lastId = -1; // Инициализируем переменную для хранения последнего ID
+
+            // SQL запрос для получения последнего ID из таблицы
+            string sqlQuery = $"SELECT TOP 1 Id FROM Использование ORDER BY Id DESC";
+
+            // Создаем подключение к базе данных
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                // Создаем команду для выполнения SQL запроса
+                using (SqlCommand cmd = new SqlCommand(sqlQuery, connection))
+                {
+                    // Открываем подключение к базе данных
+                    connection.Open();
+
+                    // Выполняем запрос и получаем последний ID
+                    object result = cmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        lastId = Convert.ToInt32(result);
+                    }
+
+                    // Закрываем подключение
+                    connection.Close();
+                }
+            }
+
+            return lastId;
+        }
+        public static void SaveLastIdToJson(int lastId, string filePath)
+        {
+            // Создаем объект для сохранения
+            var lastIdObject = new { LastId = lastId };
+
+            // Сериализуем объект в JSON
+            string json = JsonConvert.SerializeObject(lastIdObject);
+
+            // Записываем JSON в файл
+            File.WriteAllText(filePath, json);
+        }
+        
+        public static void SendUsageMessage()
+        {
+            //SaveLastIdToJson(, "lastUsageID.json");
+        }
+        
         static void Main(string[] args)
         {
+
+
+            // Вызываем метод для получения данных и конвертируем в JSON
+      
+
+            // Выводим JSON на консоль
+          
             //StartupManager.HideConsoleWindow();
             //StartupManager.CreateBatStartup();
+            DataBaseHelper.connectionString = connectionString;
 
+            OSBoot();
+
+            // Запуск мониторинга использования оперативной памяти
+
+            RAMUsageMonitor.StartMonitoring();
             IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());
+            AppMonitoringHelper.AppMonitor(connectionString);
 
             Task.Run(() => StartServer(1111, HendleClient, localAddr));
             ReceiveBroadcastMessages("224.0.0.252", 11000);
             Console.ReadKey();
-
-            try
-            {
-                //tring jsonFilePath = @"C:\Users\User\Desktop\ClientS6\ClientS6\bin\Debug\net6.0-windows\data.json";
-
-                // string jsonContent = File.ReadAllText(jsonFilePath);
-                //  dynamic data = JsonConvert.DeserializeObject(jsonContent);
-
-                // var obj = JObject.Parse(jsonContent);
-                /*                string serverAddress = "127.0.0.1";//(string)obj["serverAddress"];
-
-                                DeviceData<NetworkInterfaceData> DataNetwork = new() { Data = NetworkInformationGatherer.GetNetworkInterfaces(), SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber() };
-                                DeviceData<CPUData> DataCPU = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererCPU.GetCPU() };
-                                DeviceData<RAMData> DataRAM = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererRAM.GetRAM() };
-                                DeviceData<VideoСardData> DataVideoCard = new() { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = InformationGathererVideoCard.GetModels() };
-
-
-                                Console.WriteLine(JsonHelper.SerializeDeviceData(new DeviceData<WindowData> { SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber(), Data = OSInformationGatherer.GetWindows() }));
-
-
-                                ServerMessageSender.SendMessage(serverAddress, 9440, JsonConvert.SerializeObject(new DeviceInitialization(InformationGathererBIOS.GetBiosSerialNumber(), OSInformationGatherer.GetComputerName())));
-                                ServerMessageSender.SendMessage(serverAddress, 9930, JsonHelper.SerializeDeviceData(DataNetwork));
-                                ServerMessageSender.SendMessage(serverAddress, 9860, JsonHelper.SerializeDeviceData(DataCPU));
-                                ServerMessageSender.SendMessage(serverAddress, 9790, JsonHelper.SerializeDeviceData(DataRAM));
-                                ServerMessageSender.SendMessage(serverAddress, 9370, JsonHelper.SerializeDeviceData(DataVideoCard));
-                                ServerMessageSender.SendMessage(serverAddress, 9230, JsonConvert.SerializeObject(new DiskData(InformationGathererDisk.TotalSpace(), InformationGathererBIOS.GetBiosSerialNumber())));
-                                ServerMessageSender.SendMessage(serverAddress, 9160, JsonConvert.SerializeObject(new OSData(OSInformationGatherer.GetOperatingSystem(), InformationGathererBIOS.GetBiosSerialNumber())));
-                                ServerMessageSender.SendMessageUsage<UsageRAM>(serverAddress, 9720, JsonConvert.SerializeObject(new UsageRAM(InformationGathererRAM.GetUsageRam(), InformationGathererBIOS.GetBiosSerialNumber())));
-                                ServerMessageSender.SendMessageUsage<UsageOS>(serverAddress, 9650, JsonConvert.SerializeObject(new UsageOS(InformationGathererUser.GetUserName(), OSInformationGatherer.GetSystemState(), InformationGathererBIOS.GetBiosSerialNumber())));
-                                ServerMessageSender.SendMessageUsage<UsageCPU>(serverAddress, 9580, JsonConvert.SerializeObject(new UsageCPU(InformationGathererCPU.GetProcessorTemperature(), InformationGathererCPU.GetCpuUsage(), InformationGathererBIOS.GetBiosSerialNumber())));
-                                ServerMessageSender.SendMessageUsage<UsageEthernet>(serverAddress, 9510, JsonConvert.SerializeObject(new UsageEthernet(NetworkInformationGatherer.EthernetSpeed(), InformationGathererBIOS.GetBiosSerialNumber())));
-                                ServerMessageSender.SendMessageUsage<UsageDisk>(serverAddress, 9300, JsonConvert.SerializeObject(new UsageDisk(InformationGathererDisk.TotalFreeSpace(), InformationGathererBIOS.GetBiosSerialNumber())));
-                                ServerMessageSender.SendMessageWindow(serverAddress, 9090, OSInformationGatherer.GetWindows());*/
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            
         }
     }
 
