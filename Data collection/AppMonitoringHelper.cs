@@ -31,7 +31,8 @@ namespace Data_collection
                 List<ApplicationData> InsertMissingApps = FindMissingApplications(inFileApps, inReestrApps);
                 foreach (var App in InsertMissingApps)
                 {
-                    DataBaseHelper.Query($"INSERT INTO Приложения (Пользователь, Название, Вес, [Дата установки]) VALUES ('{SID}','{App.DisplayName}',{Convert.ToUInt32(App.SizeInMB)},'{App.InstallDate}')", connectionString);
+                    DataBaseHelper.Query($"EXECUTE ВставитьПриложение @Пользователь = '{SID}',@НазваниеПриложения = '{App.DisplayName}' , @ДатаУстановки = '{App.InstallDate}', @Вес = {Convert.ToUInt32(App.SizeInMB)}", connectionString);
+                    
                 }
                 
                 //Наоборот 
@@ -50,7 +51,7 @@ namespace Data_collection
                 List<ApplicationData> applicationsFromReestr = DeserializeJsonToApplicationData(jsonAppsReest);
                 foreach (var App in applicationsFromReestr)
                 {
-                    DataBaseHelper.Query($"INSERT INTO Приложения (Пользователь, Название, Вес, [Дата установки]) VALUES ('{SID}','{App.DisplayName}',{Convert.ToUInt32(App.SizeInMB)},'{App.InstallDate}')",connectionString);
+                    DataBaseHelper.Query($"EXECUTE ВставитьПриложение @Пользователь = '{SID}',@НазваниеПриложения = '{App.DisplayName}' , @ДатаУстановки = '{App.InstallDate}', @Вес = {Convert.ToUInt32(App.SizeInMB)}", connectionString);
                 }
             }
 
