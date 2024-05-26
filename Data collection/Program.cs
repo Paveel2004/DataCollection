@@ -427,15 +427,10 @@ namespace Data_collection
             //StartupManager.HideConsoleWindow();
             //StartupManager.CreateBatStartup();
             DataBaseHelper.connectionString = connectionString;
-
-          
-
             // Запуск мониторинга использования оперативной памяти
-
-
-            DeviceWriter.Write();
-            DriveWriter.Write();
-            RamWriter.Write();
+            Writer.WriteDevice();
+            Writer.WriteDrive();
+            Writer.WriteRam();
             //OSBoot();
             RAMUsageMonitor.StartMonitoring();            
             AppMonitoringHelper.AppMonitor();
