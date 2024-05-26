@@ -16,7 +16,7 @@ namespace Data_collection.Monitor
     internal class AppMonitoringHelper
     {
 
-        public static void AppMonitor(string connectionString)
+        public static void AppMonitor()
         {
             const string fileName = "applications.json"; // Имя файла, который вы хотите проверить
             string exeDirectory = AppDomain.CurrentDomain.BaseDirectory; // Папка, где находится EXE файл
@@ -32,7 +32,7 @@ namespace Data_collection.Monitor
                 List<ApplicationData> InsertMissingApps = FindMissingApplications(inFileApps, inReestrApps);
                 foreach (var App in InsertMissingApps)
                 {
-                    DataBaseHelper.Query($"EXECUTE ВставитьПриложение @Пользователь = '{SID}',@НазваниеПриложения = '{App.DisplayName}' , @ДатаУстановки = '{App.InstallDate}', @Вес = {Convert.ToUInt32(App.SizeInMB)}", connectionString);
+                    DataBaseHelper.Query($"EXECUTE ВставитьПриложение @Пользователь = '{SID}',@НазваниеПриложения = '{App.DisplayName}' , @ДатаУстановки = '{App.InstallDate}', @Вес = {Convert.ToUInt32(App.SizeInMB)}");
 
                 }
 
@@ -52,7 +52,7 @@ namespace Data_collection.Monitor
                 List<ApplicationData> applicationsFromReestr = DeserializeJsonToApplicationData(jsonAppsReest);
                 foreach (var App in applicationsFromReestr)
                 {
-                    DataBaseHelper.Query($"EXECUTE ВставитьПриложение @Пользователь = '{SID}',@НазваниеПриложения = '{App.DisplayName}' , @ДатаУстановки = '{App.InstallDate}', @Вес = {Convert.ToUInt32(App.SizeInMB)}", connectionString);
+                    DataBaseHelper.Query($"EXECUTE ВставитьПриложение @Пользователь = '{SID}',@НазваниеПриложения = '{App.DisplayName}' , @ДатаУстановки = '{App.InstallDate}', @Вес = {Convert.ToUInt32(App.SizeInMB)}");
                 }
             }
 

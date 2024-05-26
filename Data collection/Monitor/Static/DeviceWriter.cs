@@ -21,18 +21,7 @@ namespace Data_collection.Monitor.Static
                 deviceName = InformationGathererBIOS.GetDeviceType(),
                 biosSerialNumber = InformationGathererBIOS.GetBiosSerialNumber(),
             };
-
-
-            if (File.Exists(filePath))
-            {
-                string readJson = JsonReader.ReadJsonFile(filePath);
-                string deviceJson = JsonSerializer.Serialize(device);
-                if(readJson != deviceJson)
-                {
-                    DataBaseHelper.Query($"INSERT INTO Устройтво  (\"Серийный номер BIOS\",\"Имя\")  VALUES ('{device.biosSerialNumber}','{device.deviceName}')");
-                }                               
-            }
-            else
+            if (!File.Exists(filePath))
             {
                 DataBaseHelper.Query($"INSERT INTO Устройтво  (\"Серийный номер BIOS\",\"Имя\")  VALUES ('{device.biosSerialNumber}','{device.deviceName}')");
                 JsonWriter.WriteToJsonFile(device, filePath);

@@ -428,14 +428,15 @@ namespace Data_collection
             //StartupManager.CreateBatStartup();
             DataBaseHelper.connectionString = connectionString;
 
-            OSBoot();
+          
 
             // Запуск мониторинга использования оперативной памяти
 
 
             DeviceWriter.Write();
+            //OSBoot();
             RAMUsageMonitor.StartMonitoring();            
-            AppMonitoringHelper.AppMonitor(connectionString);
+            AppMonitoringHelper.AppMonitor();
 
 
             IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());
