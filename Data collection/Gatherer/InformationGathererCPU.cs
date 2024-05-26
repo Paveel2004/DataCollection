@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Management;
 using GlobalClass.Static_data;
-namespace Data_collection
+
+namespace Data_collection.Gatherer
 {
     internal static class InformationGathererCPU
     {
         public static string GetProcessorArchitecture()
-        { 
+        {
             using (var searcher = new ManagementObjectSearcher("SELECT Architecture FROM Win32_Processor"))
             {
                 foreach (ManagementObject obj in searcher.Get())
@@ -24,7 +25,7 @@ namespace Data_collection
         {
             using (var searcher = new ManagementObjectSearcher("SELECT Name FROM Win32_Processor"))
             {
-                foreach(ManagementObject obj in searcher.Get())
+                foreach (ManagementObject obj in searcher.Get())
                 {
                     return obj["Name"].ToString();
                 }
@@ -58,12 +59,12 @@ namespace Data_collection
             return 0;
         }
 
-        public static double GetProcessorTemperature() 
+        public static double GetProcessorTemperature()
         {
             try
             {
 
-                Double CPUtprt = 0;
+                double CPUtprt = 0;
                 ManagementObjectSearcher mos = new ManagementObjectSearcher(@"root\WMI", "SELECT * FROM MSAcpi_ThermalZoneTemperature");
                 foreach (ManagementObject mo in mos.Get())
                 {
@@ -92,7 +93,7 @@ namespace Data_collection
                     return loadPercentage;
                 }
             }
-            catch (ManagementException e) {}
+            catch (ManagementException e) { }
             // В случае ошибки возвращаем -1 или другое значение по вашему усмотрению
             return -1;
         }
@@ -122,12 +123,12 @@ namespace Data_collection
         {
             List<CPUData> cpu = new List<CPUData>();
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_Processor");
-            foreach(ManagementObject obj in searcher.Get())
+            foreach (ManagementObject obj in searcher.Get())
             {
                 string model = obj["Name"].ToString();
                 string architecture = GetArchitecture((ushort)obj["Architecture"]);
                 int numberOfCores = Convert.ToInt32(obj["NumberOfCores"]);
-                cpu.Add(new CPUData(model, architecture,numberOfCores));
+                cpu.Add(new CPUData(model, architecture, numberOfCores));
             }
             return cpu;
         }

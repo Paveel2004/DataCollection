@@ -10,7 +10,7 @@ using GlobalClass.Static_data;
 using System.Runtime.CompilerServices;
 using System.Reflection.Metadata.Ecma335;
 
-namespace Data_collection
+namespace Data_collection.Gatherer
 {
     public class InformationGathererRAM
     {
@@ -161,7 +161,7 @@ namespace Data_collection
 
             return 0;
         }
-        public static double GetUsageRam() => Math.Round((1 - (FreeRAM() / GetTotalPhysicalMemoryToGB())) * 100);
+        public static double GetUsageRam() => Math.Round((1 - FreeRAM() / GetTotalPhysicalMemoryToGB()) * 100);
         public static List<RAMData> GetRAM()
         {
             List<RAMData> RAMs = new List<RAMData>();

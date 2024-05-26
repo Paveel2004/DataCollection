@@ -9,7 +9,8 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using GlobalClass.Static_data;
-namespace Data_collection
+
+namespace Data_collection.Gatherer
 {
     internal class NetworkInformationGatherer
     {
@@ -49,12 +50,12 @@ namespace Data_collection
 
             return "N/A";
         }
-        
+
         public static double EthernetSpeed()
         {
             try
             {
-                var nics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+                var nics = NetworkInterface.GetAllNetworkInterfaces();
                 // Select desired NIC
                 var nic = nics.SingleOrDefault(n => n.Name == "Ethernet");
 
@@ -76,10 +77,11 @@ namespace Data_collection
 
 
                 var bSec = reads.Sum() / reads.Count();
-                var kbs = (bSec * 8) / 1024;
+                var kbs = bSec * 8 / 1024;
 
                 return kbs;
-            }catch (Exception ex) { return -1; }
+            }
+            catch (Exception ex) { return -1; }
 
 
         }

@@ -1,4 +1,5 @@
-﻿using Server;
+﻿using Data_collection.Gatherer;
+using Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Data_collection
+namespace Data_collection.Monitor.Usage
 {
     public static class RAMUsageMonitor
     {

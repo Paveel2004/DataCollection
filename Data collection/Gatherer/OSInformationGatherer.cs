@@ -8,7 +8,8 @@ using System.Management;
 using System.Text;
 using System.Threading.Tasks;
 using GlobalClass.Static_data;
-namespace Data_collection
+
+namespace Data_collection.Gatherer
 {
     static class OSInformationGatherer
     {

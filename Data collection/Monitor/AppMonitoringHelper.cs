@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using Data_collection.Gatherer;
+using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Server;
@@ -10,11 +11,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data_collection
+namespace Data_collection.Monitor
 {
     internal class AppMonitoringHelper
     {
-   
+
         public static void AppMonitor(string connectionString)
         {
             const string fileName = "applications.json"; // Имя файла, который вы хотите проверить
@@ -32,9 +33,9 @@ namespace Data_collection
                 foreach (var App in InsertMissingApps)
                 {
                     DataBaseHelper.Query($"EXECUTE ВставитьПриложение @Пользователь = '{SID}',@НазваниеПриложения = '{App.DisplayName}' , @ДатаУстановки = '{App.InstallDate}', @Вес = {Convert.ToUInt32(App.SizeInMB)}", connectionString);
-                    
+
                 }
-                
+
                 //Наоборот 
                 List<ApplicationData> DeleteMissingApps = FindMissingApplications(inReestrApps, inFileApps);
                 foreach (var App in DeleteMissingApps)
@@ -46,7 +47,7 @@ namespace Data_collection
             else
             {
                 SaveRegistryDataToJson(fileName);
-               
+
                 string jsonAppsReest = GetRegistryDataAsJson();
                 List<ApplicationData> applicationsFromReestr = DeserializeJsonToApplicationData(jsonAppsReest);
                 foreach (var App in applicationsFromReestr)
@@ -82,7 +83,7 @@ namespace Data_collection
                 }
                 else
                 {
-                  
+
                     return string.Empty;
                 }
             }

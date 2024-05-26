@@ -29,4 +29,8 @@
     <None Include="C:\Users\ASUS\source\repos\Data collection\Data collection\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Writer\" />
+  </ItemGroup>
+
 </Project>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Management;
 
-namespace Data_collection
+namespace Data_collection.Gatherer
 {
     internal class InformationGathererProcess
     {
@@ -15,25 +15,25 @@ namespace Data_collection
             string ProcessName { get; set; }
             string ProcessID { get; set; }
             DateTime datatime { get; set; }
-            public ProvessInfo(string ProcessName, string ProcessID, DateTime dateTime) 
+            public ProvessInfo(string ProcessName, string ProcessID, DateTime dateTime)
             {
                 this.ProcessName = ProcessName;
                 this.ProcessID = ProcessID;
-                this.datatime = dateTime;
+                datatime = dateTime;
             }
 
         }
 
         public List<ProvessInfo> closeProcess = new List<ProvessInfo>();
 
-        public List<System.Diagnostics.Process> GetPrcessList()
+        public List<Process> GetPrcessList()
         {
-            List<System.Diagnostics.Process> list = new List<System.Diagnostics.Process>();
-            foreach (var process in System.Diagnostics.Process.GetProcesses())
+            List<Process> list = new List<Process>();
+            foreach (var process in Process.GetProcesses())
             {
                 try
                 {
-                    if(process.MainWindowTitle != "") 
+                    if (process.MainWindowTitle != "")
                     {
                         list.Add(process);
                     }
@@ -45,17 +45,17 @@ namespace Data_collection
             }
             return list;
         }
-        
+
         async Task CloseProcess()
         {
             ManagementEventWatcher watcher = new ManagementEventWatcher("SELECT * FROM Win32_ProcessStopTrace");
             watcher.EventArrived += (sender, e) =>
             {
-                
-      /*          Console.WriteLine("Процесс был закрыт: {0}, ID: {1}, Время: {2}",
-                    e.NewEvent.Properties["ProcessName"].Value,
-                    e.NewEvent.Properties["ProcessID"].Value,
-                    DateTime.Now);*/
+
+                /*          Console.WriteLine("Процесс был закрыт: {0}, ID: {1}, Время: {2}",
+                              e.NewEvent.Properties["ProcessName"].Value,
+                              e.NewEvent.Properties["ProcessID"].Value,
+                              DateTime.Now);*/
                 closeProcess.Add(new ProvessInfo(e.NewEvent.Properties["ProcessName"].Value.ToString(), e.NewEvent.Properties["ProcessID"].Value.ToString(), DateTime.Now));
             };
             watcher.Start();

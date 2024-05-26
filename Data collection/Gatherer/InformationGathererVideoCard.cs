@@ -6,7 +6,7 @@ using System.Management;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data_collection
+namespace Data_collection.Gatherer
 {
     internal class InformationGathererVideoCard
     {

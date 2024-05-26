@@ -11,8 +11,9 @@ using PcapDotNet.Packets;
 using PcapDotNet.Packets.IpV4;
 using PcapDotNet.Packets.IpV6;
 using PcapDotNet.Packets.Transport;
-using Data_collection;
-namespace Data_collection.Connection;
+using Data_collection.Connection;
+
+namespace Data_collection.Gatherer;
 
 static public class Sniffer
 {
@@ -78,7 +79,7 @@ static public class Sniffer
             foreach (var query in dns.Queries)
             {
                 Console.WriteLine($"Domain: {query.DomainName} | Time: {packet.Timestamp}");
-               
+
             }
         }
     }

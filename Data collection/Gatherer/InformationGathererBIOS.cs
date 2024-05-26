@@ -5,9 +5,9 @@ using System.Management;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data_collection
+namespace Data_collection.Gatherer
 {
-    internal class InformationGathererBIOS
+    internal class InformationGathererBIOS : PowerShell
     {
         public static string GetBiosSerialNumber()
         {
@@ -35,5 +35,22 @@ namespace Data_collection
 
             return "Unknown";
         }
+        public static string GetDeviceType()
+        {
+            // Команда PowerShell
+            string powerShellCommand = @"
+$system = Get-WmiObject -Class Win32_ComputerSystem
+if ($system.PCSystemType -eq 2) {
+    'Ноутбук'
+} elseif ($system.PCSystemType -eq 1) {
+    'Настольный компьютер'
+} else {
+    'Неизвестно'
+}";
+
+            // Выполняем команду PowerShell и получаем результат
+            return PowerShell.RunPowerShellCommand(powerShellCommand).Trim();
+        }
+
     }
 }

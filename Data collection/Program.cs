@@ -24,7 +24,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Data_collection.Control;
 using System.Text.Json;
-using static Data_collection.InformationGathererProcess;
+using static Data_collection.Gatherer.InformationGathererProcess;
 using GlobalClass;
 using Newtonsoft.Json.Converters;
 using Server;
@@ -35,7 +35,10 @@ using System.CodeDom.Compiler;
 using Microsoft.VisualBasic;
 using Microsoft.Data.SqlClient;
 using System.Data;
-
+using Data_collection.Gatherer;
+using Data_collection.Monitor;
+using Data_collection.Monitor.Usage;
+using Data_collection.Monitor.Static;
 namespace Data_collection
 {
 
@@ -203,7 +206,7 @@ namespace Data_collection
     {"Загруженность ОЗУ", InformationGathererRAM.GetUsageRam() + " %"},
     {"Состояние ОС", OSInformationGatherer.GetSystemState().ToString()},
     {"Версия ОС", OSInformationGatherer.GetOperatingSystemVersion().ToString()},
-    {"Свободное место", InformationGathererDisk.TotalFreeSpace().ToString()},
+    {"Свободное место", InformationGathererDrive.TotalFreeSpace().ToString()},
     {"Время работы", runtime.ToString(@"hh\:mm\:ss")}
 };
                             json = JsonConvert.SerializeObject(Info, Formatting.Indented);
@@ -265,7 +268,7 @@ namespace Data_collection
                                {"Операционная система", OSInformationGatherer.GetOperatingSystem().ToString()},
                                {"Текущий пользователь", InformationGathererUser.GetUserName().ToString()},
                                 {"Оперативная память", (double.Parse(InformationGathererRAM.GetTotalPhysicalMemory().ToString()) / (1024 * 1024)).ToString() + " МБ"},
-                               {"Объём диска", InformationGathererDisk.TotalSpace().ToString()},
+                               {"Объём диска", InformationGathererDrive.TotalSpace().ToString()},
                                {"Видеокарта", InformationGathererVideoCard.GetModel().ToString()}
                         };
 
@@ -289,7 +292,7 @@ namespace Data_collection
                                 OS = OSInformationGatherer.GetOperatingSystem(),
                                 OSVersion = OSInformationGatherer.GetOperatingSystemVersion(),
                                 OSArchitecture = OSInformationGatherer.GetSystemBitArchitecture().ToString(),
-                                TotalSpaceDisk = InformationGathererDisk.TotalSpace().ToString(),
+                                TotalSpaceDisk = InformationGathererDrive.TotalSpace().ToString(),
                                 SerialNumberBIOS = InformationGathererBIOS.GetBiosSerialNumber().ToString(),
                             };
                             json = JsonConvert.SerializeObject(sborka, Formatting.Indented);
@@ -429,10 +432,13 @@ namespace Data_collection
 
             // Запуск мониторинга использования оперативной памяти
 
-            RAMUsageMonitor.StartMonitoring();
-            IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());
+
+            DeviceWriter.Write();
+            RAMUsageMonitor.StartMonitoring();            
             AppMonitoringHelper.AppMonitor(connectionString);
 
+
+            IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());
             Task.Run(() => StartServer(1111, HendleClient, localAddr));
             ReceiveBroadcastMessages("224.0.0.252", 11000);
             Console.ReadKey();

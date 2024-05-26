@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Data_collection
 {
-    internal static class PowerShell
+    internal class PowerShell
     {
         public static List<string> GetPowershellValueList(string table, string column)
         {
@@ -29,7 +29,7 @@ namespace Data_collection
             // Возвращаем список строк с серийными номерами
             return serialNumbers;
         }
-        static string RunPowerShellCommand(string command)
+        protected static string RunPowerShellCommand(string command)
         {
             // Создаем новый процесс для выполнения команды PowerShell
             Process process = new Process();
