@@ -35,15 +35,16 @@ namespace Data_collection.Gatherer
             }
             return totalSpace / Math.Pow(1024, 3);
         }
-        public static List<Dictionary<string, string>> GetPhysicalDiskInfo()
+        public static List<Dictionary<string, string>> GetInfo()
         {
             // Получаем значения из методов
             List<string> models = PowerShell.GetPowershellValueList("PhysicalDisk", "FriendlyName");
             List<string> canPools = PowerShell.GetPowershellValueList("PhysicalDisk", "CanPool");
             List<string> mediaTypes = PowerShell.GetPowershellValueList("PhysicalDisk", "MediaType");
+            List<string> sizes = PowerShell.GetPowershellValueList("PhysicalDisk", "Size");
 
             // Проверяем, что все списки имеют одинаковое количество элементов
-            if (models.Count != canPools.Count || models.Count != mediaTypes.Count)
+            if (models.Count != canPools.Count || models.Count != mediaTypes.Count || models.Count != sizes.Count)
             {
                 throw new Exception("Количество элементов в списках не совпадает.");
             }
@@ -55,21 +56,21 @@ namespace Data_collection.Gatherer
             for (int i = 0; i < models.Count; i++)
             {
                 var diskInfo = new Dictionary<string, string>
-            {
-                { "Model", models[i] },
-                { "CanPool", canPools[i] },
-                { "MediaType", mediaTypes[i] }
-            };
+                {
+                     { "Model", models[i] },
+                     { "CanPool", canPools[i] },
+                     { "MediaType", mediaTypes[i] },
+                     { "Size", sizes[i] } // Добавляем размер
+                };
                 physicalDiskInfo.Add(diskInfo);
             }
 
             return physicalDiskInfo;
         }
-    
-        public static List<string> GetModel() => PowerShell.GetPowershellValueList("PhysicalDisk", "FriendlyName");
-        public static List<string> GetPul() => PowerShell.GetPowershellValueList("PhysicalDisk", "CanPool");
-        public static List<string> GetType() => PowerShell.GetPowershellValueList("PhysicalDisk", "MediaType");
 
-
+        /*        public static List<string> GetModel() => PowerShell.GetPowershellValueList("PhysicalDisk", "FriendlyName");
+                public static List<string> GetPul() => PowerShell.GetPowershellValueList("PhysicalDisk", "CanPool");
+                public static List<string> GetType() => PowerShell.GetPowershellValueList("PhysicalDisk", "MediaType");
+                private static List<string> GetSize() => PowerShell.GetPowershellValueList("PhysicalDisk", "Size");*/
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Data_collection.Gatherer;
+using Server;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,16 +14,15 @@ namespace Data_collection.Monitor.Static
 
         public static void Write()
         {
-            List<Dictionary<string, string>> physicalDiskInfo = InformationGathererDrive.GetPhysicalDiskInfo();
+            List<Dictionary<string, string>> physicalDiskInfo = InformationGathererDrive.GetInfo();
+
 
             // Выводим информацию в консоль
             foreach (var diskInfo in physicalDiskInfo)
             {
-                Console.WriteLine("Model: " + diskInfo["Model"]);
-                Console.WriteLine("CanPool: " + diskInfo["CanPool"]);
-                Console.WriteLine("MediaType: " + diskInfo["MediaType"]);
-                Console.WriteLine();
+                DataBaseHelper.Query($"EXECUTE ДобавитьДиск @BIOS = '{InformationGathererBIOS.GetBiosSerialNumber()}', @Модель = '{diskInfo["Model"]}', @Пул = '{diskInfo["CanPool"]}', @Тип = '{diskInfo["MediaType"]}', @Объём = '{diskInfo["Size"]}'");
             }
+
         }
 
     }

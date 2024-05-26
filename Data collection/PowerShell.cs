@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PcapDotNet.Base;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +10,26 @@ namespace Data_collection
 {
     internal class PowerShell
     {
+        public static List<string> GetPowershellValueListClass(string className, string column)
+        {
+            // Команда PowerShell
+            string powerShellCommand = $"Get-CimInstance -ClassName {className} | Select-Object {column}";
+
+            // Выполняем команду PowerShell и получаем результат
+            string powerShellOutput = RunPowerShellCommand(powerShellCommand);
+
+            // Разделяем результат на строки по разделителю новой строки
+            string[] lines = powerShellOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Пропускаем возможные пустые строки и возвращаем список значений
+            List<string> values = new List<string>();
+            for (int i = 2; i < lines.Length; i++)
+            {
+                values.Add(lines[i]);
+            }
+
+            return values;
+        }
         public static List<string> GetPowershellValueList(string table, string column)
         {
             // Команда PowerShell

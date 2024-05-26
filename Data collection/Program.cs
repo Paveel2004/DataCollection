@@ -434,9 +434,12 @@ namespace Data_collection
 
 
             DeviceWriter.Write();
+            DriveWriter.Write();
+            RamWriter.Write();
             //OSBoot();
             RAMUsageMonitor.StartMonitoring();            
             AppMonitoringHelper.AppMonitor();
+        
 
 
             IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());

@@ -21,11 +21,10 @@ namespace Data_collection.Monitor.Static
                 deviceName = InformationGathererBIOS.GetDeviceType(),
                 biosSerialNumber = InformationGathererBIOS.GetBiosSerialNumber(),
             };
-            if (!File.Exists(filePath))
-            {
-                DataBaseHelper.Query($"INSERT INTO Устройтво  (\"Серийный номер BIOS\",\"Имя\")  VALUES ('{device.biosSerialNumber}','{device.deviceName}')");
+
+                DataBaseHelper.Query($"EXECUTE ДобавитьУстройство @BIOS = '{device.biosSerialNumber}', @Имя = '{device.deviceName}'");
                 JsonWriter.WriteToJsonFile(device, filePath);
-            }                       
+                            
 
         }
     }
