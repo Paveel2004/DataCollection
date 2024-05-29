@@ -36,9 +36,10 @@ namespace Data_collection.Gatherer
             List<string> names = PowerShell.GetPowershellValueListClass("Win32_VideoController", "Name");
             List<string> adapters = PowerShell.GetPowershellValueListClass("Win32_VideoController", "AdapterCompatibility");
             List<string> gpus = PowerShell.GetPowershellValueListClass("Win32_VideoController", "VideoProcessor");
+            List<string> adapterRAM = PowerShell.GetPowershellValueListClass("Win32_VideoController", "AdapterRAM");
 
             // Проверяем, что все списки имеют одинаковое количество элементов
-            if (names.Count != adapters.Count || names.Count != gpus.Count)
+            if (names.Count != adapters.Count || names.Count != gpus.Count || names.Count != adapterRAM.Count)
             {
                 throw new Exception("Количество элементов в списках не совпадает.");
             }
@@ -53,13 +54,15 @@ namespace Data_collection.Gatherer
         {
             { "Name", names[i] },
             { "AdapterCompatibility", adapters[i] },
-            { "VideoProcessor", gpus[i] }
+            { "VideoProcessor", gpus[i] },
+            { "AdapterRAM", adapterRAM[i] } // Включаем AdapterRAM в словарь
         };
                 videoInfo.Add(videoItem);
             }
 
             return videoInfo;
         }
+
 
     }
 }

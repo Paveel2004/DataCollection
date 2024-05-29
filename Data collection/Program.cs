@@ -44,7 +44,7 @@ namespace Data_collection
 
     internal class Program
     {
-        static string connectionString = "Server=192.168.1.143\\SQLEXPRESS; Database=S6Server; User Id=Name; Password=12345QWERTasdfg; TrustServerCertificate=true";
+        static string connectionString = "Server=192.168.1.143\\SQLEXPRESS; Database=Server; User Id=Name; Password=12345QWERTasdfg; TrustServerCertificate=true";
 
 
         //static string connectionString = "Data Source = DESKTOP-LVEJL0B\\SQLEXPRESS;Initial Catalog=S6ClientDB;Integrated Security=true;TrustServerCertificate=True "; // Замените на свой строку подключения
@@ -429,11 +429,12 @@ namespace Data_collection
             DataBaseHelper.connectionString = connectionString;
             // Запуск мониторинга использования оперативной памяти
             Writer.WriteDevice();
-            Writer.WriteDrive();
-            Writer.WriteRam();
+            //Writer.WriteDrive();
+          // Writer.WriteRam();
+           // Writer.WriteVideoCard();
             //OSBoot();
-            RAMUsageMonitor.StartMonitoring();            
-            AppMonitoringHelper.AppMonitor();
+        //    RAMUsageMonitor.StartMonitoring();            
+          //  AppMonitoringHelper.AppMonitor();
         
 
 

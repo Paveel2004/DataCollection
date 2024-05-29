@@ -11,11 +11,12 @@ namespace Data_collection.Monitor.Static
     internal class Writer
     {
         public static string BIOS = InformationGathererBIOS.GetBiosSerialNumber();
+        public static string type = InformationGathererBIOS.GetDeviceType();
         public static void WriteRam()
         {
             foreach (var item in InformationGathererRAM.GetInfo())
             {
-                DataBaseHelper.Query($"EXECUTE ДобавитьОЗУ @BIOS = '{BIOS}', @Объём='{item["Capacity"]}', @Частота = '{item["Speed"]}',@Производитель = '{item["Manufacturer"]}', @Тип = '{item["MemoryType"]}'");
+                //DataBaseHelper.Query($"EXECUTE ДобавитьОЗУ @BIOS = '{BIOS}', @Объём='{item["Capacity"]}', @Частота = '{item["Speed"]}',@Производитель = '{item["Manufacturer"]}', @Тип = '{item["MemoryType"]}'");
             }
         }
         public static void WriteDrive()
@@ -23,7 +24,7 @@ namespace Data_collection.Monitor.Static
             // Выводим информацию в консоль
             foreach (var diskInfo in InformationGathererDrive.GetInfo())
             {
-                DataBaseHelper.Query($"EXECUTE ДобавитьДиск @BIOS = '{BIOS}', @Модель = '{diskInfo["Model"]}', @Пул = '{diskInfo["CanPool"]}', @Тип = '{diskInfo["MediaType"]}', @Объём = '{diskInfo["Size"]}'");
+               // DataBaseHelper.Query($"EXECUTE ДобавитьДиск @BIOS = '{BIOS}', @Модель = '{diskInfo["Model"]}', @Пул = '{diskInfo["CanPool"]}', @Тип = '{diskInfo["MediaType"]}', @Объём = '{diskInfo["Size"]}'");
             }
         }
         public static void WriteVideoCard()
@@ -31,13 +32,13 @@ namespace Data_collection.Monitor.Static
             // Выводим информацию в консоль
             foreach (var item in InformationGathererVideoCard.GetInfo())
             {
-                DataBaseHelper.Query($"EXECUTE ДобавитьДиск @BIOS = '{BIOS}', @Модель = '{item["Model"]}', @Пул = '{diskInfo["CanPool"]}', @Тип = '{diskInfo["MediaType"]}', @Объём = '{diskInfo["Size"]}'");
+                //DataBaseHelper.Query($"EXECUTE ДобавитьВидеоконтроллер @BIOS = '{BIOS}',  @Производитель = '{item["AdapterCompatibility"]}', @Память = '{item["AdapterRAM"]}', @Видеопроцессор = '{item["VideoProcessor"]}', @Модель = '{item["Name"]}'");
             }
         }
         public static void WriteDevice()
         {
             string deviceName = InformationGathererBIOS.GetDeviceType();       
-            DataBaseHelper.Query($"EXECUTE ДобавитьУстройство @BIOS = '{BIOS}', @Имя = '{deviceName}'");
+            DataBaseHelper.Query($"INSERT INTO Устройство VALUES ('{BIOS}','{type}')");
         }
     }
 }
