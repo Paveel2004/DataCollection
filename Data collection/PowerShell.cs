@@ -10,7 +10,7 @@ namespace Data_collection
 {
     internal class PowerShell
     {
-        public static List<string> GetPowershellValueListClass(string className, string column)
+        protected static List<string> GetPowershellValueListClass(string className, string column)
         {
             // Команда PowerShell
             string powerShellCommand = $"Get-CimInstance -ClassName {className} | Select-Object {column}";
@@ -30,7 +30,7 @@ namespace Data_collection
 
             return values;
         }
-        public static List<string> GetPowershellValueList(string table, string column)
+        protected static List<string> GetPowershellValueList(string table, string column)
         {
             // Команда PowerShell
             string powerShellCommand = $"Get-{table} | Format-Table {column}";

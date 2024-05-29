@@ -14,7 +14,7 @@ namespace Data_collection.Monitor.Static
         public static string type = InformationGathererBIOS.GetDeviceType();
         public static void WriteRam()
         {
-            foreach (var item in InformationGathererRAM.GetInfo())
+            foreach (var item in AssemblyItemInfo.GetPhisicalMemoryInfo())
             {
                 //DataBaseHelper.Query($"EXECUTE ДобавитьОЗУ @BIOS = '{BIOS}', @Объём='{item["Capacity"]}', @Частота = '{item["Speed"]}',@Производитель = '{item["Manufacturer"]}', @Тип = '{item["MemoryType"]}'");
             }
@@ -22,17 +22,20 @@ namespace Data_collection.Monitor.Static
         public static void WriteDrive()
         {
             // Выводим информацию в консоль
-            foreach (var diskInfo in InformationGathererDrive.GetInfo())
+            foreach (var item in AssemblyItemInfo.GetDriveInfo())
             {
-               // DataBaseHelper.Query($"EXECUTE ДобавитьДиск @BIOS = '{BIOS}', @Модель = '{diskInfo["Model"]}', @Пул = '{diskInfo["CanPool"]}', @Тип = '{diskInfo["MediaType"]}', @Объём = '{diskInfo["Size"]}'");
+                int poolValue = item["CanPool"] == "True" ? 1 : 0;
+
+                DataBaseHelper.Query($"EXECUTE InsertDrive @Device = '{BIOS}', @SerialNumber = '{item["SerialNumber"]}', @Type = '{item["MediaType"]}', @Model = '{item["FriendlyName"]}', @Memory = {item["Size"]}, @PartitionStyle = '{item["PartitionStyle"]}', @Pool = {poolValue};");
             }
         }
+
         public static void WriteVideoCard()
         {
             // Выводим информацию в консоль
-            foreach (var item in InformationGathererVideoCard.GetInfo())
+            foreach (var item in AssemblyItemInfo.GetVideoControllerInfo())
             {
-                //DataBaseHelper.Query($"EXECUTE ДобавитьВидеоконтроллер @BIOS = '{BIOS}',  @Производитель = '{item["AdapterCompatibility"]}', @Память = '{item["AdapterRAM"]}', @Видеопроцессор = '{item["VideoProcessor"]}', @Модель = '{item["Name"]}'");
+                DataBaseHelper.Query($"EXECUTE InsertVideoAdapter @Device = '{BIOS}', @SerialNumber = '{item["PNPDeviceID"]}', @Model = '{item["Name"]}', @GPU = '{item["VideoProcessor"]}', @Manufacturer = '{item["AdapterCompatibility"]}', @Memory = {item["AdapterRAM"]};");
             }
         }
         public static void WriteDevice()

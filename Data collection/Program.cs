@@ -429,6 +429,8 @@ namespace Data_collection
             DataBaseHelper.connectionString = connectionString;
             // Запуск мониторинга использования оперативной памяти
             Writer.WriteDevice();
+            Writer.WriteVideoCard();
+            Writer.WriteDrive();
             //Writer.WriteDrive();
           // Writer.WriteRam();
            // Writer.WriteVideoCard();

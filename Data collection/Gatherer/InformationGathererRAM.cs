@@ -35,38 +35,7 @@ namespace Data_collection.Gatherer
             }
         }
 
-        public static List<Dictionary<string, string>> GetInfo()
-        {
-            // Получаем значения из методов
-            List<string> capacities = PowerShell.GetPowershellValueListClass("Win32_PhysicalMemory", "Capacity");
-            List<string> speeds = PowerShell.GetPowershellValueListClass("Win32_PhysicalMemory", "Speed");
-            List<string> memoryTypes = PowerShell.GetPowershellValueListClass("Win32_PhysicalMemory", "MemoryType");
-            List<string> formFactors = PowerShell.GetPowershellValueListClass("Win32_PhysicalMemory", "Manufacturer");
-
-            // Проверяем, что все списки имеют одинаковое количество элементов
-            if (capacities.Count != speeds.Count || capacities.Count != memoryTypes.Count || capacities.Count != formFactors.Count)
-            {
-                throw new Exception("Количество элементов в списках не совпадает.");
-            }
-
-            // Создаем список словарей для хранения данных
-            List<Dictionary<string, string>> memoryInfo = new List<Dictionary<string, string>>();
-
-            // Объединяем значения в словари и добавляем их в список
-            for (int i = 0; i < capacities.Count; i++)
-            {
-                var memoryItem = new Dictionary<string, string>
-        {
-            { "Capacity", capacities[i] },
-            { "Speed", speeds[i] },
-            { "MemoryType", memoryTypes[i] },
-            { "Manufacturer", formFactors[i] }
-        };
-                memoryInfo.Add(memoryItem);
-            }
-
-            return memoryInfo;
-        }
+      
 
         private static string TypeString(int type)
         {

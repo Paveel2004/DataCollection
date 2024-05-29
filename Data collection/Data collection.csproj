@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Writer\" />
+    <Folder Include="Write\" />
   </ItemGroup>
 
 </Project>
