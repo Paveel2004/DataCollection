@@ -11,12 +11,12 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data_collection.Monitor
+namespace Data_collection.Monitor.Usage
 {
-    internal class AppMonitoringHelper
+    internal partial class AppMonitoring
     {
 
-        public static void AppMonitor()
+        public static void StartMonitor()
         {
             const string fileName = "applications.json"; // Имя файла, который вы хотите проверить
             string exeDirectory = AppDomain.CurrentDomain.BaseDirectory; // Папка, где находится EXE файл
@@ -40,7 +40,7 @@ namespace Data_collection.Monitor
                 List<ApplicationData> DeleteMissingApps = FindMissingApplications(inReestrApps, inFileApps);
                 foreach (var App in DeleteMissingApps)
                 {
-                    DataBaseHelper.Query($"EXECUTE УдалитьПриложение @Название = '{App.DisplayName}' ");
+                    DataBaseHelper.Query($"EXECUTE УдалитьПриложение @Название = '{App.DisplayName}', @SIDПользователя='{SID}' ");
                 }
                 SaveRegistryDataToJson(fileName);
             }
@@ -187,13 +187,6 @@ namespace Data_collection.Monitor
 
             string json = JsonConvert.SerializeObject(applications, Formatting.Indented);
             return json;
-        }
-
-        class ApplicationData
-        {
-            public string DisplayName { get; set; }
-            public string InstallDate { get; set; }
-            public double SizeInMB { get; set; }
         }
     }
 }

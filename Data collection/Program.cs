@@ -428,16 +428,23 @@ namespace Data_collection
             //StartupManager.CreateBatStartup();
             DataBaseHelper.connectionString = connectionString;
             // Запуск мониторинга использования оперативной памяти
-            Writer.WriteDevice();
-            Writer.WriteVideoCard();
-            Writer.WriteDrive();
+            AssemblyWriter.WriteDevice();
+            AssemblyWriter.WriteVideoCard();
+            AssemblyWriter.WriteDrive();
+            AssemblyWriter.WriteRam();
+            AssemblyWriter.WriteProcessor();
+            AssemblyWriter.WritePhysicalNetworkInterface();
+            AssemblyWriter.WriteOperatingSystem();
+            AssemblyWriter.WriteUser();
+            AppMonitoring.StartMonitor();
+
             //Writer.WriteDrive();
-          // Writer.WriteRam();
-           // Writer.WriteVideoCard();
+            // Writer.WriteRam();
+            // Writer.WriteVideoCard();
             //OSBoot();
-        //    RAMUsageMonitor.StartMonitoring();            
-          //  AppMonitoringHelper.AppMonitor();
-        
+            //    RAMUsageMonitor.StartMonitoring();            
+            //  AppMonitoringHelper.AppMonitor();
+
 
 
             IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());

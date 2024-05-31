@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,17 +84,12 @@ namespace Data_collection.Monitor.Static
         public static List<Dictionary<string, string>> GetPhisicalMemoryInfo()
         {
             // Получаем значения из методов
-            List<string> capacities = GetPowershellValueListClass("Win32_PhysicalMemory", "Capacity");
-            List<string> speeds = GetPowershellValueListClass("Win32_PhysicalMemory", "Speed");
-            List<string> memoryTypes = GetPowershellValueListClass("Win32_PhysicalMemory", "MemoryType");
-            List<string> formFactors = GetPowershellValueListClass("Win32_PhysicalMemory", "Manufacturer");
-
-            // Проверяем, что все списки имеют одинаковое количество элементов
-            if (capacities.Count != speeds.Count || capacities.Count != memoryTypes.Count || capacities.Count != formFactors.Count)
-            {
-                throw new Exception("Количество элементов в списках не совпадает.");
-            }
-
+            List<string> capacities = GetPowershellValueListClass("Win32_PhysicalMemory", "Capacity");//Вместимость 
+            List<string> speeds = GetPowershellValueListClass("Win32_PhysicalMemory", "Speed");//Частота
+            List<string> memoryTypes = GetPowershellValueListClass("Win32_PhysicalMemory", "MemoryType");//Тип
+            List<string> formFactors = GetPowershellValueListClass("Win32_PhysicalMemory", "Manufacturer");//Производител            
+            List<string> deviceLocator = GetPowershellValueListClass("Win32_PhysicalMemory", "DeviceLocator ");
+            List<string> serialNumber = GetPowershellValueListClass("Win32_PhysicalMemory", "SerialNumber ");
             // Создаем список словарей для хранения данных
             List<Dictionary<string, string>> memoryInfo = new List<Dictionary<string, string>>();
 
@@ -101,17 +97,150 @@ namespace Data_collection.Monitor.Static
             for (int i = 0; i < capacities.Count; i++)
             {
                 var memoryItem = new Dictionary<string, string>
-        {
+            {
             { "Capacity", capacities[i] },
             { "Speed", speeds[i] },
             { "MemoryType", memoryTypes[i] },
-            { "Manufacturer", formFactors[i] }
-        };
+            { "Manufacturer", formFactors[i] },
+            { "DeviceLocator", deviceLocator[i] },
+            {  "SerialNumber", serialNumber[i] }
+            };
                 memoryInfo.Add(memoryItem);
             }
-
             return memoryInfo;
         }
+        public static List<Dictionary<string, string>> GetOperatingSystemInfo()
+        {
+            // Получаем значения из методов
+            List<string> serialNumbers = GetValueWMI("Win32_OperatingSystem", "SerialNumber");
+            List<string> osArchitectures = GetValueWMI("Win32_OperatingSystem", "OSArchitecture");
+            List<string> versions = GetValueWMI("Win32_OperatingSystem", "Version");
+            List<string> captions = GetValueWMI("Win32_OperatingSystem", "Caption");
+
+            // Проверяем, что все списки имеют одинаковое количество элементов
+            if (serialNumbers.Count != osArchitectures.Count || serialNumbers.Count != versions.Count || serialNumbers.Count != captions.Count)
+            {
+                throw new Exception("Количество элементов в списках не совпадает.");
+            }
+
+            // Создаем список словарей для хранения данных
+            List<Dictionary<string, string>> operatingSystemInfo = new List<Dictionary<string, string>>();
+
+            // Объединяем значения в словари и добавляем их в список
+            for (int i = 0; i < serialNumbers.Count; i++)
+            {
+                var osInfo = new Dictionary<string, string>
+        {
+            { "SerialNumber", serialNumbers[i] },
+            { "OSArchitecture", osArchitectures[i] },
+            { "Version", versions[i] },
+            { "Caption", captions[i] }
+        };
+                operatingSystemInfo.Add(osInfo);
+            }
+
+            return operatingSystemInfo;
+        }
+        public static List<Dictionary<string, string>> GetUsersInfo()
+        {
+            // Получаем значения из методов
+            List<string> names = GetValueWMI("Win32_UserAccount", "Name");
+            List<string> sids = GetValueWMI("Win32_UserAccount", "SID");
+
+            // Создаем список словарей для хранения данных
+            List<Dictionary<string, string>> usersInfo = new List<Dictionary<string, string>>();
+
+            // Проверяем, что все списки имеют одинаковое количество элементов
+            if (names.Count != sids.Count)
+            {
+                throw new Exception("Количество элементов в списках не совпадает.");
+            }
+
+            // Объединяем значения в словари и добавляем их в список
+            for (int i = 0; i < names.Count; i++)
+            {
+                var userInfo = new Dictionary<string, string>
+        {
+            { "Name", names[i] },
+            { "SID", sids[i] }
+        };
+                usersInfo.Add(userInfo);
+            }
+
+            return usersInfo;
+        }
+
+        public static List<Dictionary<string, string>> GetProcessorInfo()
+        {
+            // Получаем значения из методов
+            List<string> processorId = GetPowershellValueListClass("Win32_Processor", "ProcessorId");
+            List<string> name = GetPowershellValueListClass("Win32_Processor", "Name");
+            List<string> architecture = GetPowershellValueListClass("Win32_Processor", "Architecture");
+            List<string> numberOfCores = GetPowershellValueListClass("Win32_Processor", "NumberOfCores");
+            List<string> socketDesignation = GetPowershellValueListClass("Win32_Processor", "SocketDesignation");
+            List<string> numberOfLogicalProcessors = GetPowershellValueListClass("Win32_Processor", "NumberOfLogicalProcessors");            
+            List<string> manufacturer = GetPowershellValueListClass("Win32_Processor", "Manufacturer");
+            List<string> speed = GetPowershellValueListClass("Win32_Processor", "MaxClockSpeed");
+            // Проверяем, что все списки имеют одинаковое количество элементов
+            if (processorId.Count != name.Count || processorId.Count != architecture.Count || processorId.Count != numberOfCores.Count ||
+                processorId.Count != socketDesignation.Count || processorId.Count != numberOfLogicalProcessors.Count || processorId.Count != manufacturer.Count)
+            {
+                throw new Exception("Количество элементов в списках не совпадает.");
+            }
+
+            // Создаем список словарей для хранения данных
+            List<Dictionary<string, string>> processorInfo = new List<Dictionary<string, string>>();
+
+            // Объединяем значения в словари и добавляем их в список
+            for (int i = 0; i < processorId.Count; i++)
+            {
+                var processorItem = new Dictionary<string, string>
+        {
+            { "ProcessorId", processorId[i] },
+            { "Name", name[i] },
+            { "Architecture", architecture[i] },
+            { "NumberOfCores", numberOfCores[i] },
+            { "SocketDesignation", socketDesignation[i] },
+            { "NumberOfLogicalProcessors", numberOfLogicalProcessors[i] },
+            { "Manufacturer", manufacturer[i] },
+            { "MaxClockSpeed", speed[i] },
+        };
+                processorInfo.Add(processorItem);
+            }
+
+            return processorInfo;
+        }
+
+        public static List<Dictionary<string, string>> GetNetworkInterfaceInfo()
+        {
+            List<string> names = GetPowershellValueListClass("Win32_NetworkAdapter", "Name");
+            List<string> descriptions = GetPowershellValueListClass("Win32_NetworkAdapter", "Description");
+            List<string> macAddresses = GetPowershellValueListClass("Win32_NetworkAdapter", "MACAddress");
+            List<string> physicalAddresses = GetPowershellValueListClass("Win32_NetworkAdapter", "PhysicalAdapter");
+
+            if (names.Count != descriptions.Count || names.Count != macAddresses.Count ||
+                names.Count != physicalAddresses.Count)
+            {
+                throw new Exception("Количество элементов в списках не совпадает.");
+            }
+
+            List<Dictionary<string, string>> networkInterfaceInfo = new List<Dictionary<string, string>>();
+
+            for (int i = 0; i < names.Count; i++)
+            {
+                var networkInterfaceItem = new Dictionary<string, string>
+        {
+            { "Name", names[i] },
+            { "Description", descriptions[i] },
+            { "MACAddress", macAddresses[i] },
+            { "PhysicalAdapter", physicalAddresses[i] }
+        };
+                networkInterfaceInfo.Add(networkInterfaceItem);
+            }
+
+            return networkInterfaceInfo;
+        }
+
 
 
     }
