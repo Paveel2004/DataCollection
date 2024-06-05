@@ -3,14 +3,18 @@ using Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
 namespace Data_collection.Monitor.Usage
 {
-    public static class RAMUsageMonitor
+    public class RAMUsageMonitor : PowerShell
     {
+
+        static List<string> SN = GetValueWMI("Win32_PhysicalMemory", "SerialNumber");
+        static string SID = InformationGathererUser.GetUserSID();
         private static System.Timers.Timer _timer; // Таймер для выполнения мониторинга
         private static double _totalRAMUsage = 0; // Общее использование оперативной памяти
         private static int _numSamples = 0; // Количество собранных образцов
@@ -56,8 +60,9 @@ namespace Data_collection.Monitor.Usage
         {
             // Выполняем запрос к базе данных для записи данных об использовании памяти
             string dateTimeString = DateTime.Now.ToString("s");
-            DataBaseHelper.Query($"EXECUTE ДобавитьИспользование @СерийныйНомерBIOS='{InformationGathererBIOS.GetBiosSerialNumber()}', @ТипХарактеристики = 'ОЗУ', @Характеристика = 'Загруженность', @Значение = '{averageRAMUsage}', @ДатаВремя = '{dateTimeString}'");
 
+            Console.WriteLine("Hello");
+            DataBaseHelper.Query($"INSERT INTO ЗагруженностьОЗУ ([Серийный номер ОЗУ],Значение,[Дата/Время],Пользователь)\r\nVALUES ('{SN[0]}', {averageRAMUsage},'{dateTimeString}','{SID}');");
         }
 
     }

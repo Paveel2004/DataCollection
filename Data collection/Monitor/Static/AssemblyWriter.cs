@@ -75,7 +75,7 @@ namespace Data_collection.Monitor.Static
                     $"@Manufacturer = '{item["Manufacturer"]}', " +
                     $"@SocketDesignation = '{item["SocketDesignation"]}', " +
                     $"@CoreCount = {item["NumberOfCores"]}, " +
-                    $"@NumberOfLogicalProcessors = {item["NumberOfLogicalProcessors"]}" +
+                    $"@NumberOfLogicalProcessors = {item["NumberOfLogicalProcessors"]}," +
                     $"@Speed = {item["MaxClockSpeed"]}");
             }
         }

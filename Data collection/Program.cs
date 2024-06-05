@@ -44,8 +44,7 @@ namespace Data_collection
 
     internal class Program
     {
-        static string connectionString = "Server=192.168.1.143\\SQLEXPRESS; Database=Server; User Id=Name; Password=12345QWERTasdfg; TrustServerCertificate=true";
-
+        private static string connectionString = "Server=192.168.24.134\\SQLEXPRESS; Database=Server; User Id=Name; Password=12345QWERTasdfg; TrustServerCertificate=true";
 
         //static string connectionString = "Data Source = DESKTOP-LVEJL0B\\SQLEXPRESS;Initial Catalog=S6ClientDB;Integrated Security=true;TrustServerCertificate=True "; // Замените на свой строку подключения
         static async void StartServer(int port, Action<TcpClient> handleClient, IPAddress localAddr)
@@ -428,21 +427,23 @@ namespace Data_collection
             //StartupManager.CreateBatStartup();
             DataBaseHelper.connectionString = connectionString;
             // Запуск мониторинга использования оперативной памяти
-            AssemblyWriter.WriteDevice();
-            AssemblyWriter.WriteVideoCard();
-            AssemblyWriter.WriteDrive();
-            AssemblyWriter.WriteRam();
-            AssemblyWriter.WriteProcessor();
-            AssemblyWriter.WritePhysicalNetworkInterface();
-            AssemblyWriter.WriteOperatingSystem();
-            AssemblyWriter.WriteUser();
-            AppMonitoring.StartMonitor();
+            /*            AssemblyWriter.WriteDevice();
+                        AssemblyWriter.WriteVideoCard();
+                        AssemblyWriter.WriteDrive();
+                        AssemblyWriter.WriteRam();
+                        AssemblyWriter.WriteProcessor();
+                       // AssemblyWriter.WritePhysicalNetworkInterface();
+                        AssemblyWriter.WriteOperatingSystem();
+                        AssemblyWriter.WriteUser();
+                        AppMonitoring.StartMonitor();*/
+            RAMUsageMonitor.StartMonitoring();
 
+            ProcessorUsageMonitor.StartMonitoring();
             //Writer.WriteDrive();
             // Writer.WriteRam();
             // Writer.WriteVideoCard();
             //OSBoot();
-            //    RAMUsageMonitor.StartMonitoring();            
+
             //  AppMonitoringHelper.AppMonitor();
 
 

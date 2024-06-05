@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Data_collection
 {
-    internal class PowerShell
+    public class PowerShell
     {
         protected static List<string> GetPowershellValueListClass(string className, string column)
         {
