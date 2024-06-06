@@ -44,7 +44,7 @@ namespace Data_collection
 
     internal class Program
     {
-        private static string connectionString = "Server=192.168.24.134\\SQLEXPRESS; Database=Server; User Id=Name; Password=12345QWERTasdfg; TrustServerCertificate=true";
+        private static string connectionString = "Server=WIN-5CLMGM4LR48\\SQLEXPRESS; Database=Server; User Id=Name; Password=12345QWERTasdfg; TrustServerCertificate=true";
 
         //static string connectionString = "Data Source = DESKTOP-LVEJL0B\\SQLEXPRESS;Initial Catalog=S6ClientDB;Integrated Security=true;TrustServerCertificate=True "; // Замените на свой строку подключения
         static async void StartServer(int port, Action<TcpClient> handleClient, IPAddress localAddr)
@@ -438,7 +438,7 @@ namespace Data_collection
                         AppMonitoring.StartMonitor();*/
             RAMUsageMonitor.StartMonitoring();
 
-            ProcessorUsageMonitor.StartMonitoring();
+            //ProcessorUsageMonitor.StartMonitoring();
             //Writer.WriteDrive();
             // Writer.WriteRam();
             // Writer.WriteVideoCard();
