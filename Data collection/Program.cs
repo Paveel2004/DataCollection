@@ -255,6 +255,9 @@ namespace Data_collection
                 if (message == "END") break;
                 switch (message)
                 {
+                    case "getBios":
+                        ServerMessageSender.SendMessage(result.RemoteEndPoint.Address.ToString(), 2222, InformationGathererBIOS.GetBiosSerialNumber());
+                        break;
                     case "getAll":
                         var data = new Dictionary<string, string>
                         {
