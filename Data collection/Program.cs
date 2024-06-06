@@ -261,15 +261,15 @@ namespace Data_collection
                     case "getAll":
                         var data = new Dictionary<string, string>
                         {
+                            {"Имя компьютера", OSInformationGatherer.GetComputerName().ToString()},
+                            {"Текущий пользователь", InformationGathererUser.GetUserName().ToString()},
                                {"IP Адрес", NetworkInformationGatherer.GetIPAddress().ToString()},
                                {"MAC Адрес", NetworkInformationGatherer.GetMacAddress().ToString()},
                                {"Процессор", InformationGathererCPU.GetProcessorName().ToString()},
                                {"Количество ядер в процессоре", InformationGathererCPU.GetProcessorCoreCount().ToString()},
-                               {"Архитектура процессора", InformationGathererCPU.GetProcessorArchitecture().ToString()},
-                               {"Имя компьютера", OSInformationGatherer.GetComputerName().ToString()},
-                               {"Операционная система", OSInformationGatherer.GetOperatingSystem().ToString()},
-                               {"Текущий пользователь", InformationGathererUser.GetUserName().ToString()},
-                                {"Оперативная память", (double.Parse(InformationGathererRAM.GetTotalPhysicalMemory().ToString()) / (1024 * 1024)).ToString() + " МБ"},
+                               {"Архитектура процессора", InformationGathererCPU.GetProcessorArchitecture().ToString()},                               
+                               {"Операционная система", OSInformationGatherer.GetOperatingSystem().ToString()},                              
+                               {"Оперативная память", (double.Parse(InformationGathererRAM.GetTotalPhysicalMemory().ToString()) / (1024 * 1024)).ToString() + " МБ"},
                                {"Объём диска", InformationGathererDrive.TotalSpace().ToString()},
                                {"Видеокарта", InformationGathererVideoCard.GetModel().ToString()}
                         };
