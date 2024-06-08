@@ -47,6 +47,43 @@ namespace Data_collection.Monitor.Static
 
             return physicalDiskInfo;
         }
+        public static List<Dictionary<string, string>> GetTomInfo()
+        {
+            // Получаем значения из методов
+            List<string> models = GetPowershellValueList("Volume", "DriveLetter");//Модель 
+            List<string> canPools = GetPowershellValueList("Volume", "FileSystemType");//Пул
+            List<string> mediaTypes = GetPowershellValueList("Volume", "Size");//Тип
+            List<string> sizes = GetPowershellValueList("Volume", "SizeRemaining");//Объём
+
+
+            //
+
+            // Проверяем, что все списки имеют одинаковое количество элементов
+            if (models.Count != canPools.Count || models.Count != mediaTypes.Count || models.Count != sizes.Count || models.Count != partitionStyle.Count)
+            {
+                throw new Exception("Количество элементов в списках не совпадает.");
+            }
+
+            // Создаем список словарей для хранения данных
+            List<Dictionary<string, string>> physicalDiskInfo = new List<Dictionary<string, string>>();
+
+            // Объединяем значения в словари и добавляем их в список
+            for (int i = 0; i < models.Count; i++)
+            {
+                var diskInfo = new Dictionary<string, string>
+                {
+                     { "FriendlyName", models[i] },
+                     { "CanPool", canPools[i] },
+                     { "MediaType", mediaTypes[i] },
+                     { "Size", sizes[i] },
+                     { "PartitionStyle", partitionStyle[i] },
+                     { "SerialNumber", serialNumber[i] },
+                };
+                physicalDiskInfo.Add(diskInfo);
+            }
+
+            return physicalDiskInfo;
+        }
         public static List<Dictionary<string, string>> GetVideoControllerInfo()
         {
             // Получаем значения из методов

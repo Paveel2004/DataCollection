@@ -188,13 +188,7 @@ namespace Data_collection
                             break;
                         case "getProcesses":
                             response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(GetProcessInfo()));
-                            break;
-                        case "closeProcess [Name]":
-                            break;
-                        case "getKeye":
-                            break;
-                        case "getUsageRAM":
-                            break;
+                            break;       
                         case "getApplications":
                             response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(GetInstalledApps()));
                             break;
