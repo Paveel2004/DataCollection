@@ -47,7 +47,7 @@ namespace Data_collection.Monitor.Static
 
             return physicalDiskInfo;
         }
-        public static List<Dictionary<string, string>> GetTomInfo()
+/*        public static List<Dictionary<string, string>> GetTomInfo()
         {
             // Получаем значения из методов
             List<string> models = GetPowershellValueList("Volume", "DriveLetter");//Модель 
@@ -83,7 +83,7 @@ namespace Data_collection.Monitor.Static
             }
 
             return physicalDiskInfo;
-        }
+        }*/
         public static List<Dictionary<string, string>> GetVideoControllerInfo()
         {
             // Получаем значения из методов
