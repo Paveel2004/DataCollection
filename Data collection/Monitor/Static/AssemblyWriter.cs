@@ -6,6 +6,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System;
+using Microsoft.Win32;
+using System.IO;
 
 namespace Data_collection.Monitor.Static
 {
@@ -13,6 +16,7 @@ namespace Data_collection.Monitor.Static
     {
         public static string BIOS = InformationGathererBIOS.GetBiosSerialNumber();
         public static string type = InformationGathererBIOS.GetDeviceType();
+        public static string computerName = OSInformationGatherer.GetComputerName();
         public static string serialNumberOS = OSInformationGatherer.GetOperatingSystemSerialNumber();
         public static void WriteRam()
         {
@@ -25,7 +29,7 @@ namespace Data_collection.Monitor.Static
         {
             foreach (var item in AssemblyItemInfo.GetOperatingSystemInfo())
             {
-                DataBaseHelper.Query($"EXECUTE InsertOS @Device = '{BIOS}', @SerialNumber = '{item["SerialNumber"]}', @Version = '{item["Version"]}', @Architecture = '{item["OSArchitecture"]}', @Caption = '{item["Caption"]}';");
+                DataBaseHelper.Query($"EXECUTE InsertOS @Device = '{BIOS}', @SerialNumber = '{item["SerialNumber"]}', @Version = '{item["Version"]}', @Architecture = '{item["OSArchitecture"]}', @Caption = '{item["Caption"]}', @ComputerName = '{computerName}'");
             }
         }
         public static void WriteUser()
@@ -36,6 +40,29 @@ namespace Data_collection.Monitor.Static
             }
         }
 
+        public static void WriteVolume()
+        {
+            var volumeInfo = AssemblyItemInfo.GetVolumeInfo();
+            foreach (var item in volumeInfo)
+            {
+                string driveLetter = item["DriveLetter"];
+                string fileSystem = item["FileSystem"];
+                string capacity = item["Capacity (GB)"];
+                string freeSpace = item["FreeSpace (GB)"];
+
+                // Преобразуем строковые значения в числовые, если это необходимо
+                double capacityValue = double.Parse(capacity);
+                double freeSpaceValue = double.Parse(freeSpace);
+
+                // Выполняем запрос к базе данных, используя хранимую процедуру InsertOrUpdateDisk
+                DataBaseHelper.Query($"EXECUTE InsertOrUpdateDisk " +
+                                     $"@Имя = '{driveLetter}', " +
+                                     $"@ОС = '{serialNumberOS}', " +
+                                     $"@ФайловаяСистема = '{fileSystem}', " +
+                                     $"@Размер = {capacityValue}, " +
+                                     $"@СвободноеМесто = {freeSpaceValue};");
+            }
+        }
 
         public static void WriteDrive()
         {

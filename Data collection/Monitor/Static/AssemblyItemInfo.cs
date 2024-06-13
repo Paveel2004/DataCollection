@@ -118,12 +118,46 @@ namespace Data_collection.Monitor.Static
 
             return videoControllerInfo;
         }
+        public static List<Dictionary<string, string>> GetVolumeInfo()
+        {
+            // Получаем значения из метода
+            List<string> driveLetters = GetValueWMI("Win32_Volume", "DriveLetter");
+            List<string> fileSystems = GetValueWMI("Win32_Volume", "FileSystem");
+            List<string> capacities = GetValueWMI("Win32_Volume", "Capacity");
+            List<string> freeSpaces = GetValueWMI("Win32_Volume", "FreeSpace");
+
+            // Создаем список словарей для хранения данных
+            List<Dictionary<string, string>> volumeInfo = new List<Dictionary<string, string>>();
+
+            // Проверяем, что все списки имеют одинаковое количество элементов
+            int minCount = Math.Min(Math.Min(driveLetters.Count, fileSystems.Count), Math.Min(capacities.Count, freeSpaces.Count));
+            for (int i = 0; i < minCount; i++)
+            {
+                // Проверяем, что все значения в строке присутствуют и не пустые
+                if (!string.IsNullOrWhiteSpace(driveLetters[i]) && !string.IsNullOrWhiteSpace(fileSystems[i]) && !string.IsNullOrWhiteSpace(capacities[i]) && !string.IsNullOrWhiteSpace(freeSpaces[i]))
+                {
+                    // Создаем словарь для хранения информации о том, что необходимо добавить в список
+                    var volumeItem = new Dictionary<string, string>
+            {
+                { "DriveLetter", driveLetters[i] },
+                { "FileSystem", fileSystems[i] },
+                { "Capacity (GB)", capacities[i] },
+                { "FreeSpace (GB)", freeSpaces[i] }
+            };
+                    volumeInfo.Add(volumeItem);
+                }
+            }
+
+            return volumeInfo;
+        }
+
+
         public static List<Dictionary<string, string>> GetPhisicalMemoryInfo()
         {
             // Получаем значения из методов
             List<string> capacities = GetPowershellValueListClass("Win32_PhysicalMemory", "Capacity");//Вместимость 
             List<string> speeds = GetPowershellValueListClass("Win32_PhysicalMemory", "Speed");//Частота
-            List<string> memoryTypes = GetPowershellValueListClass("Win32_PhysicalMemory", "MemoryType");//Тип
+            List<string> memoryTypes = GetPowershellValueListClass("Win32_PhysicalMemory", "SMBIOSMemoryType");//Тип
             List<string> formFactors = GetPowershellValueListClass("Win32_PhysicalMemory", "Manufacturer");//Производител            
             List<string> deviceLocator = GetPowershellValueListClass("Win32_PhysicalMemory", "DeviceLocator ");
             List<string> serialNumber = GetPowershellValueListClass("Win32_PhysicalMemory", "SerialNumber ");

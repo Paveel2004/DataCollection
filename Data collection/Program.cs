@@ -1,49 +1,27 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Management;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using GlobalClass.Static_data;
-using GlobalClass.Dynamic_data;
 using GlobalClass;
-using System.Runtime.CompilerServices;
-using System.CodeDom;
-using System.Reflection;
-using Newtonsoft.Json.Linq;
 using Data_collection.Connection;
 using System.Net;
-using System.Net.Sockets;
-using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using Data_collection.Control;
-using System.Text.Json;
-using static Data_collection.Gatherer.InformationGathererProcess;
-using GlobalClass;
-using Newtonsoft.Json.Converters;
 using Server;
-using System.Runtime.Intrinsics.Arm;
-using System.Timers;
-using System.Threading;
-using System.CodeDom.Compiler;
-using Microsoft.VisualBasic;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using Data_collection.Gatherer;
-using Data_collection.Monitor;
 using Data_collection.Monitor.Usage;
 using Data_collection.Monitor.Static;
+using System;
+using System.IO;
+
 namespace Data_collection
 {
 
-    internal class Program
+    public class Program
     {
+      
         private static string connectionString = "Server=WIN-5CLMGM4LR48\\SQLEXPRESS; Database=Server; User Id=Name; Password=12345QWERTasdfg; TrustServerCertificate=true";
 
         //static string connectionString = "Data Source = DESKTOP-LVEJL0B\\SQLEXPRESS;Initial Catalog=S6ClientDB;Integrated Security=true;TrustServerCertificate=True "; // Замените на свой строку подключения
@@ -71,6 +49,7 @@ namespace Data_collection
                 server?.Stop();
             }
         }
+        static string OS = OSInformationGatherer.GetOperatingSystemSerialNumber();
         static List<string> GetInstalledApps()
         {
             string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
@@ -163,11 +142,13 @@ namespace Data_collection
                         case "getUsers":
                             response = Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize<string[]>(OSInformationGatherer.GetActiveUserNames()));
                             break;
-                        case "blockSite":
-                            WebControl.BlockedWebsite(new StringBuilder(site));
+                        case "blockSite":                            
+                            FireWall.BlockDomain(site);
+                            DataBaseHelper.Query($"INSERT INTO \"Заблокированные сайты\"(\"URL\",\"ОС\") VALUES ('{site}', '{OS}')");
                             break;
                         case "unBlockSite":
-                            WebControl.UnBlockedWebSite(site);
+                            FireWall.UnblockDomain(site);
+                            DataBaseHelper.Query($"EXECUTE DelSite @OS = '{OS}', @URL = '{site}'");
                             break;
                         case "getTemperatureCPU":
                             response = Encoding.UTF8.GetBytes(InformationGathererCPU.GetProcessorTemperature().ToString());
@@ -410,38 +391,58 @@ namespace Data_collection
         {
             //SaveLastIdToJson(, "lastUsageID.json");
         }
+        public static string osSerialNumber = OSInformationGatherer.GetOperatingSystemSerialNumber();
+        public static string SID = InformationGathererUser.GetUserSID();
+        static void SystemEvents_SessionEnding(object sender, SessionEndingEventArgs e)
+        {
+            // Записываем в файл текущую дату и время
+            
+            DataBaseHelper.Query($"INSERT INTO Работа ([Дата/Время],Событие, Пользователь) VALUES ('{DateTime.Now}','Завершение работы','{SID}')");
+            Console.WriteLine("Система выключается, данные записаны в файл.");
+        }
         
         static void Main(string[] args)
         {
+            DataBaseHelper.connectionString = connectionString;
+            DataBaseHelper.Query($"INSERT INTO Работа ([Дата/Время],Событие, Пользователь) VALUES ('{DateTime.Now}','Запуск','{SID}')");
+            SystemEvents.SessionEnding += new SessionEndingEventHandler(SystemEvents_SessionEnding);
+
+
 
 
             // Вызываем метод для получения данных и конвертируем в JSON
-      
+
 
             // Выводим JSON на консоль
-          
+
             //StartupManager.HideConsoleWindow();
             //StartupManager.CreateBatStartup();
-            DataBaseHelper.connectionString = connectionString;
-            // Запуск мониторинга использования оперативной памяти
-            /*            AssemblyWriter.WriteDevice();
-                        AssemblyWriter.WriteVideoCard();
-                        AssemblyWriter.WriteDrive();
-                        AssemblyWriter.WriteRam();
-                        AssemblyWriter.WriteProcessor();
-                       // AssemblyWriter.WritePhysicalNetworkInterface();
-                        AssemblyWriter.WriteOperatingSystem();
-                        AssemblyWriter.WriteUser();
-                        AppMonitoring.StartMonitor();*/
-            RAMUsageMonitor.StartMonitoring();
 
+            // Запуск мониторинга использования оперативной памяти
+            AssemblyWriter.WriteDevice();
+            AssemblyWriter.WriteRam();
+            AssemblyWriter.WriteDrive();
+                
+                        AssemblyWriter.WriteProcessor();
+            AssemblyWriter.WriteVideoCard();
+           
+            // AssemblyWriter.WritePhysicalNetworkInterface();
+            AssemblyWriter.WriteOperatingSystem();
+                        AssemblyWriter.WriteUser();
+            AssemblyWriter.WriteVolume();
+
+
+            AppMonitoring.StartMonitor();
+           
+            RAMUsageMonitor.StartMonitoring();
+            AppMonitoring.StartMonitor();
             //ProcessorUsageMonitor.StartMonitoring();
             //Writer.WriteDrive();
             // Writer.WriteRam();
             // Writer.WriteVideoCard();
             //OSBoot();
 
-            //  AppMonitoringHelper.AppMonitor();
+            //AppMonitoringHelper.AppMonitor();
 
 
 
