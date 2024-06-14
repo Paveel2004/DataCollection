@@ -15,6 +15,7 @@ using Data_collection.Monitor.Usage;
 using Data_collection.Monitor.Static;
 using System;
 using System.IO;
+using System.Management;
 
 namespace Data_collection
 {
@@ -71,25 +72,7 @@ namespace Data_collection
             return installedApps;
         }
 
-        public static List<ProcessInfo> GetProcessInfo()
-        {
-            List<ProcessInfo> processInfoList = new List<ProcessInfo>();
 
-            // Получаем все процессы
-            Process[] processlist = Process.GetProcesses();
-
-            // Выводим информацию о каждом процессе
-            foreach (Process theprocess in processlist)
-            {
-                string title = theprocess.MainWindowTitle != "" ? theprocess.MainWindowTitle : "—";
-                double memoryUsageMB = theprocess.WorkingSet64 / Math.Pow(1024, 2);
-                ProcessInfo processInfo = new ProcessInfo(theprocess.ProcessName, title, memoryUsageMB);
-
-                processInfoList.Add(processInfo);
-            }
-
-            return processInfoList;
-        }
 
 
         static TimeSpan GetSystemUpTime()
@@ -168,7 +151,7 @@ namespace Data_collection
                             response = Encoding.UTF8.GetBytes(json);
                             break;
                         case "getProcesses":
-                            response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(GetProcessInfo()));
+                            response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(ProcessesMonitor.GetProcessInfo()));
                             break;       
                         case "getApplications":
                             response = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(GetInstalledApps()));
@@ -386,7 +369,6 @@ namespace Data_collection
             // Записываем JSON в файл
             File.WriteAllText(filePath, json);
         }
-        
         public static void SendUsageMessage()
         {
             //SaveLastIdToJson(, "lastUsageID.json");
@@ -400,55 +382,38 @@ namespace Data_collection
             DataBaseHelper.Query($"INSERT INTO Работа ([Дата/Время],Событие, Пользователь) VALUES ('{DateTime.Now}','Завершение работы','{SID}')");
             Console.WriteLine("Система выключается, данные записаны в файл.");
         }
-        
-        static void Main(string[] args)
+        private static void StartSessionMonitor()
         {
             DataBaseHelper.connectionString = connectionString;
             DataBaseHelper.Query($"INSERT INTO Работа ([Дата/Время],Событие, Пользователь) VALUES ('{DateTime.Now}','Запуск','{SID}')");
             SystemEvents.SessionEnding += new SessionEndingEventHandler(SystemEvents_SessionEnding);
-
-
-
-
+        }
+        static void Main(string[] args)
+        {
+            StartSessionMonitor();
             // Вызываем метод для получения данных и конвертируем в JSON
-
-
             // Выводим JSON на консоль
-
             //StartupManager.HideConsoleWindow();
             //StartupManager.CreateBatStartup();
-
             // Запуск мониторинга использования оперативной памяти
             AssemblyWriter.WriteDevice();
             AssemblyWriter.WriteRam();
-            AssemblyWriter.WriteDrive();
-                
-                        AssemblyWriter.WriteProcessor();
-            AssemblyWriter.WriteVideoCard();
-           
-            // AssemblyWriter.WritePhysicalNetworkInterface();
+            AssemblyWriter.WriteDrive();                
+            AssemblyWriter.WriteProcessor();
+            AssemblyWriter.WriteVideoCard();          
             AssemblyWriter.WriteOperatingSystem();
-                        AssemblyWriter.WriteUser();
+            AssemblyWriter.WriteUser();
             AssemblyWriter.WriteVolume();
-
-
-            AppMonitoring.StartMonitor();
-           
+            AppMonitoring.StartMonitor();           
             RAMUsageMonitor.StartMonitoring();
             AppMonitoring.StartMonitor();
-            //ProcessorUsageMonitor.StartMonitoring();
-            //Writer.WriteDrive();
-            // Writer.WriteRam();
-            // Writer.WriteVideoCard();
-            //OSBoot();
 
-            //AppMonitoringHelper.AppMonitor();
-
-
+            ProcessesMonitor.StartOpenProcessMonitor();
 
             IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());
             Task.Run(() => StartServer(1111, HendleClient, localAddr));
             ReceiveBroadcastMessages("224.0.0.252", 11000);
+
             Console.ReadKey();
             
         }

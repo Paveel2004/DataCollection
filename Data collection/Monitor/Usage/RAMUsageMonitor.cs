@@ -19,7 +19,7 @@ namespace Data_collection.Monitor.Usage
         private static double _totalRAMUsage = 0; // Общее использование оперативной памяти
         private static int _numSamples = 0; // Количество собранных образцов
         private static object _lock = new object(); // Объект блокировки для потокобезопасности
-        public static int monitoringInterval { get; set; } = 600; // Интервал мониторинга по умолчанию (1 минута)
+        public static int monitoringInterval { get; set; } = 60000; // Интервал мониторинга по умолчанию (1 минута)
 
         // Метод для запуска мониторинга
         public static void StartMonitoring()
@@ -60,8 +60,7 @@ namespace Data_collection.Monitor.Usage
         {
             // Выполняем запрос к базе данных для записи данных об использовании памяти
             string dateTimeString = DateTime.Now.ToString("s");
-
-            Console.WriteLine("Hello");
+  
             DataBaseHelper.Query($"INSERT INTO ЗагруженностьОЗУ ([Серийный номер ОЗУ],Значение,[Дата/Время],Пользователь)\r\nVALUES ('{SN[0]}', {averageRAMUsage},'{dateTimeString}','{SID}');");
         }
 
