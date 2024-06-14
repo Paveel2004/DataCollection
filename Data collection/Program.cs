@@ -223,13 +223,13 @@ namespace Data_collection
                             {"Текущий пользователь", InformationGathererUser.GetUserName().ToString()},
                                {"IP Адрес", NetworkInformationGatherer.GetIPAddress().ToString()},
                                {"MAC Адрес", NetworkInformationGatherer.GetMacAddress().ToString()},
-                               {"Процессор", InformationGathererCPU.GetProcessorName().ToString()},
-                               {"Количество ядер в процессоре", InformationGathererCPU.GetProcessorCoreCount().ToString()},
-                               {"Архитектура процессора", InformationGathererCPU.GetProcessorArchitecture().ToString()},                               
+                            //   {"Процессор", InformationGathererCPU.GetProcessorName().ToString()},
+                            //   {"Количество ядер в процессоре", InformationGathererCPU.GetProcessorCoreCount().ToString()},
+                             //  {"Архитектура процессора", InformationGathererCPU.GetProcessorArchitecture().ToString()},                               
                                {"Операционная система", OSInformationGatherer.GetOperatingSystem().ToString()},                              
                                {"Оперативная память", (double.Parse(InformationGathererRAM.GetTotalPhysicalMemory().ToString()) / (1024 * 1024)).ToString() + " МБ"},
-                               {"Объём диска", InformationGathererDrive.TotalSpace().ToString()},
-                               {"Видеокарта", InformationGathererVideoCard.GetModel().ToString()}
+                             //  {"Объём диска", InformationGathererDrive.TotalSpace().ToString()},
+                             //  {"Видеокарта", InformationGathererVideoCard.GetModel().ToString()}
                         };
 
                         json = JsonConvert.SerializeObject(data, Formatting.Indented);
