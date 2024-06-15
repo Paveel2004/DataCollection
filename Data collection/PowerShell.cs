@@ -62,13 +62,13 @@ namespace Data_collection
             string[] lines = powerShellOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
             // Пропускаем первые две строки, содержащие разделители и заголовки
-            List<string> serialNumbers = new List<string>();
+            List<string> values = new List<string>();
             for (int i = 2; i < lines.Length; i++)
             {
-                serialNumbers.Add(lines[i]);
+                values.Add(lines[i]);
             }
             // Возвращаем список строк с серийными номерами
-            return serialNumbers;
+            return values;
         }
         protected static string RunPowerShellCommand(string command)
         {
