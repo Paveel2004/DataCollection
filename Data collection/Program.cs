@@ -394,7 +394,7 @@ namespace Data_collection
             // Вызываем метод для получения данных и конвертируем в JSON
             // Выводим JSON на консоль
             //StartupManager.HideConsoleWindow();
-            //StartupManager.CreateBatStartup();
+            StartupManager.CreateBatStartup();
             // Запуск мониторинга использования оперативной памяти
             AssemblyWriter.WriteDevice();
             AssemblyWriter.WriteRam();

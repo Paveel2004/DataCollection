@@ -38,7 +38,7 @@ namespace Data_collection
 
                 string startupFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
 
-                using (StreamWriter sw = File.CreateText(Path.Combine(startupFolderPath, "MyStartup.bat")))
+                using (StreamWriter sw = File.CreateText(Path.Combine(startupFolderPath, "S6Startup.bat")))
                 {
                     sw.WriteLine("@echo off");
                     sw.WriteLine($"start \"\" \"{System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName}\"");
