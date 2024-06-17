@@ -384,13 +384,13 @@ namespace Data_collection
         }
         private static void StartSessionMonitor()
         {
-            DataBaseHelper.connectionString = connectionString;
+       
             DataBaseHelper.Query($"INSERT INTO Работа ([Дата/Время],Событие, Пользователь) VALUES ('{DateTime.Now}','Запуск','{SID}')");
             SystemEvents.SessionEnding += new SessionEndingEventHandler(SystemEvents_SessionEnding);
         }
         static void Main(string[] args)
         {
-            StartSessionMonitor();
+            DataBaseHelper.connectionString = connectionString;
             // Вызываем метод для получения данных и конвертируем в JSON
             // Выводим JSON на консоль
             //StartupManager.HideConsoleWindow();
@@ -408,6 +408,7 @@ namespace Data_collection
             RAMUsageMonitor.StartMonitoring();
             AppMonitoring.StartMonitor();
 
+            StartSessionMonitor();
             ProcessesMonitor.StartOpenProcessMonitor();
 
             IPAddress localAddr = IPAddress.Parse(NetworkInformationGatherer.GetIPAddress().ToString());
