@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Data_collection.Monitor.Static.AssemblyWriter">
+    <Position X="0.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAwAEIAAAAAkAAAEAACRAAAABAAAAAAAAAkAAAAA=</HashCode>
+      <FileName>Monitor\Static\AssemblyWriter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Monitor.Static.AssemblyItemInfo">
+    <Position X="2.5" Y="0.5" Width="2" />
+    <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true">
+      <Path>
+        <Point X="5.75" Y="5" />
+        <Point X="5.75" Y="4.32" />
+        <Point X="3.5" Y="4.32" />
+        <Point X="3.5" Y="3.079" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAABAABQgAAAAAAAAABAAAAABAgAA=</HashCode>
+      <FileName>Monitor\Static\AssemblyItemInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Monitor.Usage.RAMUsageMonitor">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true">
+      <Path>
+        <Point X="5.75" Y="5" />
+        <Point X="5.75" Y="4.318" />
+        <Point X="7.75" Y="4.318" />
+        <Point X="7.75" Y="3.982" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAgAQAgAAAABAAAAAAIJAIAAAAAAABAAAA=</HashCode>
+      <FileName>Monitor\Usage\RAMUsageMonitor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Monitor.Usage.ProcessesMonitor">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAABAEAA=</HashCode>
+      <FileName>Monitor\Usage\ProcessesMonitor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Monitor.Usage.AppMonitoring">
+    <Position X="10.5" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Class Name="Data_collection.Monitor.Usage.AppMonitoring.ApplicationData" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Monitor\Usage\ApplicationData.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAACAAAAAAIIAAAAAEAAAAAACA=</HashCode>
+      <FileName>Monitor\Usage\AppMonitoring.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Control.FireWall">
+    <Position X="9" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Control\FireWall.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.InformationGathererCPU">
+    <Position X="2.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAIAAAAIAKBAAAIEA=</HashCode>
+      <FileName>Gatherer\InformationGathererCPU.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.InformationGathererDrive">
+    <Position X="9.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Gatherer\InformationGathererDrive.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.InformationGathererProcess">
+    <Position X="5.75" Y="8.75" Width="1.5" />
+    <NestedTypes>
+      <Class Name="Data_collection.Gatherer.InformationGathererProcess.ProvessInfo" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Gatherer\InformationGathererProcess.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AACEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>Gatherer\InformationGathererProcess.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.InformationGathererRAM">
+    <Position X="0.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AggAAAAAAAAAACIAAAIAAAAAAAAABgAAAAEgAAAAABA=</HashCode>
+      <FileName>Gatherer\InformationGathererRAM.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.InformationGathererUser">
+    <Position X="5.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Gatherer\InformationGathererUser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.InformationGathererVideoCard">
+    <Position X="7.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Gatherer\InformationGathererVideoCard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.NetworkInformationGatherer">
+    <Position X="7.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAgAAAAAAAAABAAAEAAAAAgAAAAAACA=</HashCode>
+      <FileName>Gatherer\NetworkInformationGatherer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.OSInformationGatherer">
+    <Position X="4" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAgBAAAAAAAAAAAgABAEAAAApAAAAAQAAAAAAAIA=</HashCode>
+      <FileName>Gatherer\OSInformationGatherer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.StartupManager">
+    <Position X="0.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAAAAAQAAEAAAAAAAAAQAABgEAA=</HashCode>
+      <FileName>StartupManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.PowerShell">
+    <Position X="5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAIAAAAAAAIAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>PowerShell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Data_collection.Gatherer.InformationGathererBIOS">
+    <Position X="9.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgABAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Gatherer\InformationGathererBIOS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
