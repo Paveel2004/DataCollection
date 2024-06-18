@@ -142,9 +142,9 @@ namespace Data_collection
                         case "getSpeedEthernet":
                             response = Encoding.UTF8.GetBytes(NetworkInformationGatherer.EthernetSpeed().ToString());
                             break;
-                        case "getTraffic [Network Interfase Name]":
+   /*                     case "getTraffic [Network Interfase Name]":
                             Sniffer.StartSend("Intel(R) Wi-Fi 6 AX201 160MHz", clientIP, 2222);
-                            break;
+                            break;*/
                         case "getNetworkInterfases":
                             var NetworkInterfase = NetworkInformationGatherer.GetNetworkInterfaces();
                             json = JsonConvert.SerializeObject(NetworkInterfase);
