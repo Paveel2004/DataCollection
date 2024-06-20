@@ -189,7 +189,7 @@ namespace Data_collection.Monitor.Static
             List<string> captions = GetValueWMI("Win32_OperatingSystem", "Caption");
 
             // Проверяем, что все списки имеют одинаковое количество элементов
-            if (serialNumbers.Count != osArchitectures.Count || serialNumbers.Count != versions.Count || serialNumbers.Count != captions.Count)
+            if (serialNumbers.Count !=   osArchitectures.Count || serialNumbers.Count != versions.Count || serialNumbers.Count != captions.Count)
             {
                 throw new Exception("Количество элементов в списках не совпадает.");
             }

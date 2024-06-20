@@ -32,7 +32,6 @@ namespace Data_collection.Monitor.Usage
                 string processName = (string)e.NewEvent.Properties["ProcessName"].Value;
                 uint processId = (uint)e.NewEvent.Properties["ProcessID"].Value;
 
-                Console.WriteLine($"Process started: {processName} (PID: {processId})");
                 DataBaseHelper.Query($"INSERT INTO Процессы(Пользователь, Процесс, [Дата/Время]) VALUES ('{SID}', '{processName}', '{DateTime.Now}')");
 
 

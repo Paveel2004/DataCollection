@@ -11,8 +11,8 @@
     <Position X="2.5" Y="0.5" Width="2" />
     <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true">
       <Path>
-        <Point X="5.75" Y="5" />
-        <Point X="5.75" Y="4.32" />
+        <Point X="5.5" Y="5.5" />
+        <Point X="5.5" Y="4.32" />
         <Point X="3.5" Y="4.32" />
         <Point X="3.5" Y="3.079" />
       </Path>
@@ -26,8 +26,8 @@
     <Position X="7" Y="0.5" Width="1.5" />
     <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true">
       <Path>
-        <Point X="5.75" Y="5" />
-        <Point X="5.75" Y="4.318" />
+        <Point X="5.5" Y="5.5" />
+        <Point X="5.5" Y="4.318" />
         <Point X="7.75" Y="4.318" />
         <Point X="7.75" Y="3.982" />
       </Path>
@@ -45,9 +45,12 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Monitor.Usage.AppMonitoring">
-    <Position X="10.5" Y="0.5" Width="1.5" />
+    <Position X="10.5" Y="0.5" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
     <NestedTypes>
-      <Class Name="Data_collection.Monitor.Usage.AppMonitoring.ApplicationData" Collapsed="true">
+      <Class Name="Data_collection.Monitor.Usage.AppMonitoring.ApplicationData">
         <TypeIdentifier>
           <NewMemberFileName>Monitor\Usage\ApplicationData.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -55,7 +58,7 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAACAAAAAAAAAAAAAAACAAAAAAIIAAAAAEAAAAAACA=</HashCode>
-      <FileName>Monitor\Usage\AppMonitoring.cs</FileName>
+      <FileName>Monitor\Usage\ApplicationData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Control.FireWall">
@@ -136,7 +139,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.PowerShell">
-    <Position X="5" Y="5" Width="1.5" />
+    <Position X="4.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAABAAAAAIAAAAAAAIAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
       <FileName>PowerShell.cs</FileName>
@@ -144,6 +147,14 @@
   </Class>
   <Class Name="Data_collection.Gatherer.InformationGathererBIOS">
     <Position X="9.25" Y="8.75" Width="1.5" />
+    <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true">
+      <Path>
+        <Point X="5.5" Y="7.18" />
+        <Point X="5.5" Y="7.937" />
+        <Point X="10" Y="7.937" />
+        <Point X="10" Y="8.75" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAgABAAAAIAAAAAAAAAAAAAA=</HashCode>
       <FileName>Gatherer\InformationGathererBIOS.cs</FileName>
