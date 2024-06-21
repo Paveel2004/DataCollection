@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Data_collection.Monitor.Static.AssemblyWriter">
-    <Position X="0.5" Y="0.5" Width="1.75" />
+    <Position X="0.5" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAwAEIAAAAAkAAAEAACRAAAABAAAAAAAAAkAAAAA=</HashCode>
       <FileName>Monitor\Static\AssemblyWriter.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Monitor.Static.AssemblyItemInfo">
-    <Position X="2.5" Y="0.5" Width="2" />
+    <Position X="3" Y="0.5" Width="2" />
     <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true">
       <Path>
-        <Point X="5.5" Y="5.5" />
-        <Point X="5.5" Y="4.32" />
-        <Point X="3.5" Y="4.32" />
-        <Point X="3.5" Y="3.079" />
+        <Point X="3.5" Y="4.25" />
+        <Point X="3.5" Y="3.25" />
+        <Point X="4" Y="3.25" />
+        <Point X="4" Y="3.079" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -23,13 +23,13 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Monitor.Usage.RAMUsageMonitor">
-    <Position X="7" Y="0.5" Width="1.5" />
-    <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true" FixedToPoint="true">
       <Path>
-        <Point X="5.5" Y="5.5" />
-        <Point X="5.5" Y="4.318" />
-        <Point X="7.75" Y="4.318" />
-        <Point X="7.75" Y="3.982" />
+        <Point X="3.5" Y="4.25" />
+        <Point X="3.5" Y="3.25" />
+        <Point X="5.5" Y="3.25" />
+        <Point X="5.5" Y="3.375" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -38,19 +38,19 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Monitor.Usage.ProcessesMonitor">
-    <Position X="8.75" Y="0.5" Width="1.5" />
+    <Position X="7.25" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAIAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAABAEAA=</HashCode>
       <FileName>Monitor\Usage\ProcessesMonitor.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Monitor.Usage.AppMonitoring">
-    <Position X="10.5" Y="0.5" Width="2.75" />
+    <Position X="7.25" Y="2.75" Width="2.75" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Class Name="Data_collection.Monitor.Usage.AppMonitoring.ApplicationData">
+      <Class Name="Data_collection.Monitor.Usage.AppMonitoring.ApplicationData" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Monitor\Usage\ApplicationData.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -62,28 +62,28 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Control.FireWall">
-    <Position X="9" Y="5" Width="1.5" />
+    <Position X="4.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAIAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Control\FireWall.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.InformationGathererCPU">
-    <Position X="2.25" Y="8.75" Width="1.5" />
+    <Position X="3.25" Y="6.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAIAAAAIAKBAAAIEA=</HashCode>
       <FileName>Gatherer\InformationGathererCPU.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.InformationGathererDrive">
-    <Position X="9.25" Y="10.75" Width="1.5" />
+    <Position X="3.25" Y="9.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
       <FileName>Gatherer\InformationGathererDrive.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.InformationGathererProcess">
-    <Position X="5.75" Y="8.75" Width="1.5" />
+    <Position X="8.5" Y="6.5" Width="1.5" />
     <NestedTypes>
       <Class Name="Data_collection.Gatherer.InformationGathererProcess.ProvessInfo" Collapsed="true">
         <TypeIdentifier>
@@ -97,62 +97,62 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.InformationGathererRAM">
-    <Position X="0.5" Y="8.75" Width="1.5" />
+    <Position X="0.5" Y="7" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AggAAAAAAAAAACIAAAIAAAAAAAAABgAAAAEgAAAAABA=</HashCode>
       <FileName>Gatherer\InformationGathererRAM.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.InformationGathererUser">
-    <Position X="5.75" Y="11" Width="1.5" />
+    <Position X="8.5" Y="8.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAACAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
       <FileName>Gatherer\InformationGathererUser.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.InformationGathererVideoCard">
-    <Position X="7.5" Y="8.75" Width="1.5" />
+    <Position X="10.25" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Gatherer\InformationGathererVideoCard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.NetworkInformationGatherer">
-    <Position X="7.5" Y="10.25" Width="1.5" />
+    <Position X="10.25" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAgAAAAAAAAABAAAEAAAAAgAAAAAACA=</HashCode>
       <FileName>Gatherer\NetworkInformationGatherer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.OSInformationGatherer">
-    <Position X="4" Y="8.75" Width="1.5" />
+    <Position X="5.75" Y="6.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>IAAAAgBAAAAAAAAAAAgABAEAAAApAAAAAQAAAAAAAIA=</HashCode>
       <FileName>Gatherer\OSInformationGatherer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.StartupManager">
-    <Position X="0.5" Y="5" Width="1.5" />
+    <Position X="0.5" Y="4.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAABAAAAAAAAAAAAAAAQAAEAAAAAAAAAQAABgEAA=</HashCode>
       <FileName>StartupManager.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.PowerShell">
-    <Position X="4.75" Y="5.5" Width="1.5" />
+    <Position X="2.75" Y="4.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAABAAAAAIAAAAAAAIAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
       <FileName>PowerShell.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Data_collection.Gatherer.InformationGathererBIOS">
-    <Position X="9.25" Y="8.75" Width="1.5" />
-    <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true">
+    <Position X="9.5" Y="0.5" Width="2" />
+    <InheritanceLine Type="Data_collection.PowerShell" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="5.5" Y="7.18" />
-        <Point X="5.5" Y="7.937" />
-        <Point X="10" Y="7.937" />
-        <Point X="10" Y="8.75" />
+        <Point X="3.438" Y="5.93" />
+        <Point X="3.438" Y="6.242" />
+        <Point X="10.375" Y="6.242" />
+        <Point X="10.375" Y="2.117" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
